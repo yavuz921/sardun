@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Logo from "./Logo";
 
 const links = [
   { href: "#anasayfa", label: "Anasayfa" },
@@ -30,7 +31,7 @@ export default function Navbar() {
   return (
     <header style={{ backgroundColor: "rgba(19,19,19,0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid #504536", position: "sticky", top: 0, zIndex: 50 }}>
       <div style={{ maxWidth: 1440, margin: "0 auto", padding: "24px 64px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ fontSize: 32, fontWeight: 700, letterSpacing: "-0.02em", color: "#f9bc51" }}>Sardun</div>
+        <a href="#anasayfa"><Logo size={0.28} /></a>
 
         <nav style={{ display: "flex", gap: 32, alignItems: "center" }} className="hidden md:flex">
           {links.map((link) => (
