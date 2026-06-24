@@ -29,18 +29,19 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header style={{ backgroundColor: "rgba(19,19,19,0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid #504536", position: "sticky", top: 0, zIndex: 50 }}>
-      <div style={{ maxWidth: 1440, margin: "0 auto", padding: "24px 64px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <a href="#anasayfa"><Logo size={0.42} /></a>
+    <header className="sticky top-0 z-50 border-b" style={{ backgroundColor: "rgba(19,19,19,0.97)", backdropFilter: "blur(12px)", borderColor: "#504536" }}>
+      <div className="flex justify-between items-center px-5 md:px-16 py-4 md:py-6 mx-auto" style={{ maxWidth: 1440 }}>
+        <a href="#anasayfa"><Logo size={0.38} /></a>
 
-        <nav style={{ display: "flex", gap: 32, alignItems: "center" }} className="hidden md:flex">
+        {/* Desktop nav */}
+        <nav className="hidden md:flex gap-8 items-center">
           {links.map((link) => (
-            <a key={link.href} href={link.href} style={{
+            <a key={link.href} href={link.href} className="transition-colors duration-300" style={{
               fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase",
+              textDecoration: "none",
               color: active === link.href.slice(1) ? "#f9bc51" : "#e5e2e1",
               borderBottom: active === link.href.slice(1) ? "2px solid #f9bc51" : "none",
               paddingBottom: active === link.href.slice(1) ? 4 : 0,
-              textDecoration: "none", transition: "color 0.3s",
             }}>
               {link.label}
             </a>
@@ -49,30 +50,34 @@ export default function Navbar() {
 
         <a href="#iletisim" className="hidden md:inline-block" style={{
           backgroundColor: "#c9922a", color: "#472f00", padding: "12px 24px",
-          fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase",
-          textDecoration: "none", transition: "background-color 0.2s",
+          fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none",
         }}>
           TEKLİF AL
         </a>
 
-        <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)} style={{ background: "none", border: "none", color: "#e5e2e1", cursor: "pointer" }}>
-          <span className="material-symbols-outlined">{menuOpen ? "close" : "menu"}</span>
+        {/* Hamburger */}
+        <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)} style={{ background: "none", border: "none", color: "#e5e2e1", cursor: "pointer", padding: 4 }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 28 }}>{menuOpen ? "close" : "menu"}</span>
         </button>
       </div>
 
+      {/* Mobile menu */}
       {menuOpen && (
-        <div style={{ borderTop: "1px solid #504536", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 24 }}>
+        <div className="md:hidden flex flex-col gap-6 px-5 py-6" style={{ borderTop: "1px solid #262626", backgroundColor: "#131313" }}>
           {links.map((link) => (
             <a key={link.href} href={link.href} onClick={() => setMenuOpen(false)} style={{
-              fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase",
+              fontSize: 13, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase",
               color: "#e5e2e1", textDecoration: "none",
-            }}>{link.label}</a>
+            }}>
+              {link.label}
+            </a>
           ))}
-          <a href="#iletisim" onClick={() => setMenuOpen(false)} style={{
-            backgroundColor: "#c9922a", color: "#472f00", padding: "12px 24px",
-            fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase",
-            textDecoration: "none", textAlign: "center",
-          }}>TEKLİF AL</a>
+          <a href="#iletisim" onClick={() => setMenuOpen(false)} className="text-center" style={{
+            backgroundColor: "#c9922a", color: "#472f00", padding: "14px 24px",
+            fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none",
+          }}>
+            TEKLİF AL
+          </a>
         </div>
       )}
     </header>

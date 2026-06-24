@@ -9,26 +9,24 @@ const projects = [
 
 export default function Projects() {
   return (
-    <section id="projeler" className="section-padding" style={{ backgroundColor: "#0e0e0e" }}>
-      <div className="container">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 64, flexWrap: "wrap", gap: 16 }}>
-          <h2 className="section-title" style={{ fontSize: 48, fontWeight: 600, lineHeight: 1.2, letterSpacing: "-0.01em", color: "#e5e2e1", margin: 0 }}>Seçkin Projelerimiz</h2>
+    <section id="projeler" className="py-20 md:py-32 px-5 md:px-16" style={{ backgroundColor: "#0e0e0e" }}>
+      <div className="mx-auto" style={{ maxWidth: 1440 }}>
+        <div className="flex justify-between items-center gap-4 mb-12 md:mb-16 flex-wrap">
+          <h2 className="text-3xl md:text-5xl font-semibold" style={{ lineHeight: 1.2, letterSpacing: "-0.01em", color: "#e5e2e1", margin: 0 }}>Seçkin Projelerimiz</h2>
           <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#f9bc51" }}>02 / PROJELER</span>
         </div>
-        <div className="three-col">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {projects.map((p) => (
-            <div key={p.title} style={{ cursor: "pointer" }}
-              onMouseEnter={e => { const img = (e.currentTarget as HTMLElement).querySelector("img"); if (img) img.style.transform = "scale(1.1)"; }}
-              onMouseLeave={e => { const img = (e.currentTarget as HTMLElement).querySelector("img"); if (img) img.style.transform = "scale(1)"; }}>
-              <div style={{ position: "relative", aspectRatio: "3/4", overflow: "hidden", border: "1px solid #262626" }}>
-                <Image src={p.img} alt={p.alt} fill style={{ objectFit: "cover", transition: "transform 0.7s" }} unoptimized />
-                <div style={{ position: "absolute", bottom: 0, left: 0, backgroundColor: "rgba(19,19,19,0.9)", padding: 16, fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: p.statusColor }}>
+            <div key={p.title} className="cursor-pointer group">
+              <div className="relative overflow-hidden" style={{ aspectRatio: "3/4", border: "1px solid #262626" }}>
+                <Image src={p.img} alt={p.alt} fill className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
+                <div className="absolute bottom-0 left-0 p-4" style={{ backgroundColor: "rgba(19,19,19,0.9)", fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: p.statusColor }}>
                   {p.status}
                 </div>
               </div>
-              <div style={{ marginTop: 24 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#f9bc51", marginBottom: 8 }}>{p.city}</div>
-                <h3 style={{ fontSize: 28, fontWeight: 600, color: "#e5e2e1", margin: 0 }}>{p.title}</h3>
+              <div className="mt-6">
+                <div className="mb-2" style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#f9bc51" }}>{p.city}</div>
+                <h3 className="text-2xl font-semibold" style={{ color: "#e5e2e1", margin: 0 }}>{p.title}</h3>
               </div>
             </div>
           ))}

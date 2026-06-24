@@ -11,19 +11,19 @@ const links = [
 export default function Footer() {
   return (
     <footer style={{ backgroundColor: "#0e0e0e", borderTop: "1px solid #504536" }}>
-      <div className="container footer-padding" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: 32 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <Logo size={0.42} />
-          <p style={{ fontSize: 16, lineHeight: 1.6, color: "#d4c4b0", maxWidth: 280, margin: 0 }}>
+      <div className="mx-auto px-5 md:px-16 py-12 md:py-16 flex flex-col md:flex-row justify-between items-start gap-10" style={{ maxWidth: 1440 }}>
+        <div className="flex flex-col gap-4">
+          <Logo size={0.38} />
+          <p className="text-sm md:text-base max-w-xs" style={{ lineHeight: 1.6, color: "#d4c4b0", margin: 0 }}>
             Mimari mükemmellik ve mühendislik disipliniyle geleceği inşa ediyoruz.
           </p>
         </div>
-        <nav style={{ display: "flex", flexWrap: "wrap", gap: "16px 48px" }}>
+        <nav className="flex flex-wrap gap-x-10 gap-y-4">
           {links.map((l) => (
-            <a key={l.href} href={l.href} style={{ fontSize: 16, lineHeight: 1.6, color: "#d4c4b0", textDecoration: "none" }}>{l.label}</a>
+            <a key={l.href} href={l.href} className="text-sm md:text-base" style={{ color: "#d4c4b0", textDecoration: "none" }}>{l.label}</a>
           ))}
         </nav>
-        <div style={{ fontSize: 14, color: "#d4c4b0" }}>© 2025 Sardun İnşaat</div>
+        <div className="text-sm" style={{ color: "#d4c4b0" }}>© 2025 Sardun İnşaat</div>
       </div>
     </footer>
   );
