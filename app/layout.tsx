@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Sardun İnşaat | Güçlü Temeller, Kalıcı Yapılar",
   description: "Sardun İnşaat — profesyonel çözümler, güvenilir hizmet.",
   icons: {
-    icon: "/favicon.svg",
+    icon: "/favicon.png",
   },
 };
 
