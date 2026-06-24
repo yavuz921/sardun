@@ -4,21 +4,35 @@ export default function Logo({ size = 1 }: { size?: number }) {
   return (
     <svg viewBox="0 0 420 160" width={w} height={h} xmlns="http://www.w3.org/2000/svg">
       <rect width="420" height="160" fill="transparent" />
-      <rect x="40" y="42" width="4" height="76" fill="#c9922a" />
-      <text x="60" y="98"
+
+      {/* S kutusu */}
+      <rect x="20" y="30" width="80" height="100" fill="#c9922a" fillOpacity="0.08" />
+      <rect x="20" y="30" width="4" height="100" fill="#c9922a" />
+      <text x="60" y="105"
         fontFamily="Georgia, 'Times New Roman', serif"
-        fontSize="46"
+        fontSize="72"
         fontWeight="700"
-        letterSpacing="14"
+        fill="#f9bc51"
+        textAnchor="middle">S</text>
+
+      {/* SARDUN yazısı */}
+      <text x="118" y="96"
+        fontFamily="Georgia, 'Times New Roman', serif"
+        fontSize="44"
+        fontWeight="700"
+        letterSpacing="6"
         fill="#e5e2e1">SARDUN</text>
-      <line x1="60" y1="110" x2="380" y2="110" stroke="#c9922a" strokeWidth="1.5" />
-      <text x="380" y="132"
+
+      {/* Alt çizgi */}
+      <line x1="118" y1="108" x2="400" y2="108" stroke="#c9922a" strokeWidth="1.5" />
+
+      {/* İNŞAAT etiketi */}
+      <text x="118" y="128"
         fontFamily="Arial, sans-serif"
-        fontSize="14"
+        fontSize="11"
         fontWeight="600"
-        letterSpacing="8"
-        fill="#9c8f7c"
-        textAnchor="end">İNŞAAT</text>
+        letterSpacing="9"
+        fill="#9c8f7c">İNŞAAT</text>
     </svg>
   );
 }
