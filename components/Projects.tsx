@@ -9,13 +9,13 @@ const projects = [
 
 export default function Projects() {
   return (
-    <section id="projeler" style={{ padding: "128px 64px", backgroundColor: "#0e0e0e" }}>
-      <div style={{ maxWidth: 1440, margin: "0 auto" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 64 }}>
-          <h2 style={{ fontSize: 48, fontWeight: 600, lineHeight: 1.2, letterSpacing: "-0.01em", color: "#e5e2e1", margin: 0 }}>Seçkin Projelerimiz</h2>
+    <section id="projeler" className="section-padding" style={{ backgroundColor: "#0e0e0e" }}>
+      <div className="container">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 64, flexWrap: "wrap", gap: 16 }}>
+          <h2 className="section-title" style={{ fontSize: 48, fontWeight: 600, lineHeight: 1.2, letterSpacing: "-0.01em", color: "#e5e2e1", margin: 0 }}>Seçkin Projelerimiz</h2>
           <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#f9bc51" }}>02 / PROJELER</span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
+        <div className="three-col">
           {projects.map((p) => (
             <div key={p.title} style={{ cursor: "pointer" }}
               onMouseEnter={e => { const img = (e.currentTarget as HTMLElement).querySelector("img"); if (img) img.style.transform = "scale(1.1)"; }}

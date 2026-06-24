@@ -43,3 +43,90 @@ body {
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
+
+/* ── Responsive Layout Helpers ── */
+.section-padding {
+  padding: 128px 64px;
+}
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+.hero-padding {
+  padding: 0 64px;
+}
+.nav-padding {
+  padding: 24px 64px;
+}
+.footer-padding {
+  padding: 64px;
+}
+
+/* İki kolonlu grid */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+/* Hizmetler 4'lü grid */
+.four-col {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+/* Projeler 3'lü grid */
+.three-col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+/* Hakkımızda 2'li grid */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+/* Rozet grid */
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .section-padding {
+    padding: 80px 20px;
+  }
+  .hero-padding {
+    padding: 0 20px;
+  }
+  .nav-padding {
+    padding: 16px 20px;
+  }
+  .footer-padding {
+    padding: 48px 20px;
+  }
+  .two-col,
+  .four-col,
+  .three-col,
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+  .about-grid {
+    gap: 40px;
+  }
+  .badge-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .hero-title {
+    font-size: 36px !important;
+  }
+  .section-title {
+    font-size: 32px !important;
+  }
+  .about-corner {
+    display: none;
+  }
+}
