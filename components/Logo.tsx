@@ -1,20 +1,37 @@
 /*
-  SARDUN monogram — açılı S/A birleşimi, kartvizik logosundan uyarlanmış geometrik çizim.
-  variant="light" → beyaz (lacivert zemin üzeri), variant="dark" → lacivert (açık zemin üzeri)
+  SARDUN monogramı — katlanmış şerit (origami) formunda A/S birleşimi.
+  Kartvizit logosundaki 3 tonlu (koyu/orta/açık lacivert) katlı-kağıt hissi
+  düz renk polygon katmanlarıyla taklit edilir.
 */
-export function Monogram({ size = 40, color = "#ffffff" }: { size?: number; color?: string }) {
+export function Monogram({ size = 40, color = "navy" }: { size?: number; color?: "navy" | "white" }) {
+  const tones =
+    color === "white"
+      ? { dark: "#e7ebef", mid: "#ffffff", light: "#ffffff", edge: "rgba(15,29,46,0.18)" }
+      : { dark: "#16293f", mid: "#1e3a5f", light: "#2f5480", edge: "rgba(255,255,255,0.22)" };
+
   return (
-    <svg width={size} height={size * 1.1} viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Üst üçgen tepe (A'nın çatısı) */}
-      <path d="M50 2 L88 40 L76 40 L50 15 L24 40 L12 40 Z" fill={color} />
-      {/* S'nin üst kolu */}
-      <path d="M22 46 L64 46 L64 56 L34 56 L34 64 L22 64 Z" fill={color} />
-      {/* S'nin alt kolu */}
-      <path d="M36 70 L78 70 L78 88 L66 88 L66 80 L36 80 Z" fill={color} />
-      {/* Sol bacak */}
-      <path d="M22 70 L32 70 L32 108 L22 108 Z" fill={color} />
-      {/* Sağ bacak */}
-      <path d="M68 92 L78 92 L78 108 L68 108 Z" fill={color} />
+    <svg width={size} height={size * 1.2} viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+      {/* Sol çatı şeridi (orta ton) */}
+      <path d="M50 4 L10 46 L24 50 L50 22 Z" fill={tones.mid} />
+      {/* Sağ çatı şeridi (koyu ton) */}
+      <path d="M50 4 L90 46 L76 50 L50 22 Z" fill={tones.dark} />
+      {/* Üst bindirme çizgisi (kat hissi) */}
+      <path d="M50 4 L50 22" stroke={tones.edge} strokeWidth="1.2" />
+
+      {/* Orta çapraz şerit — sol içten sağa iner (açık ton) */}
+      <path d="M24 50 L50 22 L62 30 L34 60 Z" fill={tones.light} />
+      {/* Orta çapraz şerit — sağ içten sola iner (orta ton) */}
+      <path d="M76 50 L50 22 L38 30 L66 60 Z" fill={tones.mid} />
+
+      {/* S gövdesi — üst yatay kıvrım (koyu ton) */}
+      <path d="M20 56 L66 56 L66 66 L34 66 L34 74 L20 74 Z" fill={tones.dark} />
+      {/* S gövdesi — alt yatay kıvrım (orta ton) */}
+      <path d="M34 80 L80 80 L80 90 L48 90 L48 98 L34 98 Z" fill={tones.mid} />
+
+      {/* Sol ayak (koyu ton) */}
+      <path d="M20 74 L34 74 L34 112 L20 112 Z" fill={tones.dark} />
+      {/* Sağ ayak (açık ton) */}
+      <path d="M66 98 L80 98 L80 112 L66 112 Z" fill={tones.light} />
     </svg>
   );
 }
@@ -26,23 +43,34 @@ export default function Logo({
   variant?: "light" | "dark";
   compact?: boolean;
 }) {
-  const color = variant === "light" ? "#ffffff" : "#1e3a5f";
-  const subColor = variant === "light" ? "rgba(255,255,255,0.65)" : "rgba(30,58,95,0.65)";
+  const textColor = variant === "light" ? "#ffffff" : "#16293f";
+  const subColor = variant === "light" ? "rgba(255,255,255,0.6)" : "rgba(22,41,63,0.6)";
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-      <Monogram size={compact ? 30 : 36} color={color} />
+      <Monogram size={compact ? 28 : 34} color={variant === "light" ? "white" : "navy"} />
       <div style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
-        <span style={{
-          fontSize: compact ? 20 : 24, fontWeight: 800, letterSpacing: "0.14em",
-          color, fontFamily: "var(--font-inter), sans-serif",
-        }}>
+        <span
+          style={{
+            fontSize: compact ? 19 : 23,
+            fontWeight: 800,
+            letterSpacing: "0.12em",
+            color: textColor,
+            fontFamily: "var(--font-inter), sans-serif",
+          }}
+        >
           SARDUN
         </span>
         {!compact && (
-          <span style={{
-            fontSize: 8.5, fontWeight: 600, letterSpacing: "0.24em",
-            color: subColor, marginTop: 4, textTransform: "uppercase",
-          }}>
+          <span
+            style={{
+              fontSize: 8.5,
+              fontWeight: 600,
+              letterSpacing: "0.22em",
+              color: subColor,
+              marginTop: 4,
+              textTransform: "uppercase",
+            }}
+          >
             Mühendislik &amp; Mimarlık
           </span>
         )}

@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import TiltCard from "./TiltCard";
 
 const services = [
   {
@@ -26,7 +27,7 @@ const services = [
 
 export default function Services() {
   return (
-    <section id="hizmetler" className="relative py-24 md:py-36 px-5 md:px-14 blueprint-grid-light" style={{ backgroundColor: "#f5f5f2" }}>
+    <section id="hizmetler" className="relative py-24 md:py-36 px-5 md:px-14 hex-pattern-light">
       <div className="mx-auto" style={{ maxWidth: 1440 }}>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16 md:mb-20">
           <div className="max-w-2xl">
@@ -73,33 +74,34 @@ export default function Services() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.65, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -8 }}
-              className="group relative p-8 md:p-9 overflow-hidden"
-              style={{ backgroundColor: "#ffffff", border: "1px solid #e3e3de" }}
             >
-              {/* Hover'da dolan lacivert şerit */}
-              <span
-                className="absolute top-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-500"
-                style={{ backgroundColor: "#1e3a5f" }}
-              />
-              <span
-                className="material-symbols-outlined block mb-7"
-                style={{ color: "#1e3a5f", fontSize: 42 }}
-              >
-                {s.icon}
-              </span>
-              <h3 className="text-lg font-bold mb-4" style={{ color: "#16293f", letterSpacing: "-0.01em" }}>
-                {s.title}
-              </h3>
-              <p className="text-sm" style={{ lineHeight: 1.7, color: "#5a6b7d" }}>
-                {s.desc}
-              </p>
-              <span
-                className="block mt-7 text-xs font-bold"
-                style={{ color: "#c4c9cd", letterSpacing: "0.1em" }}
-              >
-                {String(i + 1).padStart(2, "0")}
-              </span>
+              <TiltCard strength={7} className="group relative overflow-hidden" style={{ backgroundColor: "#ffffff", border: "1px solid #e3e3de" }}>
+                <div className="p-8 md:p-9">
+                  {/* Hover'da dolan lacivert şerit */}
+                  <span
+                    className="absolute top-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-500"
+                    style={{ backgroundColor: "#1e3a5f" }}
+                  />
+                  <span
+                    className="material-symbols-outlined block mb-7"
+                    style={{ color: "#1e3a5f", fontSize: 42 }}
+                  >
+                    {s.icon}
+                  </span>
+                  <h3 className="text-lg font-bold mb-4" style={{ color: "#16293f", letterSpacing: "-0.01em" }}>
+                    {s.title}
+                  </h3>
+                  <p className="text-sm" style={{ lineHeight: 1.7, color: "#5a6b7d" }}>
+                    {s.desc}
+                  </p>
+                  <span
+                    className="block mt-7 text-xs font-bold"
+                    style={{ color: "#c4c9cd", letterSpacing: "0.1em" }}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                </div>
+              </TiltCard>
             </motion.div>
           ))}
         </div>

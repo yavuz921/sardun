@@ -13,7 +13,7 @@ export default function About() {
     <section id="hakkimizda" className="relative py-24 md:py-36 px-5 md:px-14 overflow-hidden" style={{ backgroundColor: "#f5f5f2" }}>
       {/* Arka plan monogram */}
       <div className="absolute hidden xl:block" style={{ left: "-80px", bottom: "-60px", opacity: 0.05 }}>
-        <Monogram size={480} color="#1e3a5f" />
+        <Monogram size={480} color="navy" />
       </div>
 
       <div className="relative mx-auto" style={{ maxWidth: 1440 }}>

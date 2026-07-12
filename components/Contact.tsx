@@ -22,7 +22,7 @@ export default function Contact() {
   };
 
   return (
-    <section id="iletisim" className="relative py-24 md:py-36 px-5 md:px-14 blueprint-grid overflow-hidden" style={{ backgroundColor: "#16293f" }}>
+    <section id="iletisim" className="relative py-24 md:py-36 px-5 md:px-14 hex-pattern overflow-hidden">
       <div className="relative mx-auto" style={{ maxWidth: 1440 }}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-24">
           {/* Sol taraf */}
