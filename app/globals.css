@@ -1,132 +1,58 @@
 @import "tailwindcss";
 
-@theme inline {
-  /* Colors */
-  --color-surface: #131313;
-  --color-surface-dim: #131313;
-  --color-surface-bright: #3a3939;
-  --color-surface-container-lowest: #0e0e0e;
-  --color-surface-container-low: #1c1b1b;
-  --color-surface-container: #201f1f;
-  --color-surface-container-high: #2a2a2a;
-  --color-surface-container-highest: #353534;
-  --color-on-surface: #e5e2e1;
-  --color-on-surface-variant: #d4c4b0;
-  --color-outline: #9c8f7c;
-  --color-outline-variant: #504536;
-  --color-primary: #f9bc51;
-  --color-on-primary: #432c00;
-  --color-primary-container: #c9922a;
-  --color-on-primary-container: #472f00;
-  --color-secondary: #c9c6c2;
-  --color-on-secondary-variant: #b7b5b0;
+:root {
+  --navy: #1e3a5f;
+  --navy-deep: #16293f;
+  --navy-darker: #0f1d2e;
+  --off-white: #f5f5f2;
+  --paper: #ffffff;
+  --steel: #8fa3b8;
+  --line: #2c4a6e;
+  --accent: #d9a441;
+}
 
-  /* Border radius - sharp/0 */
-  --radius: 0px;
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background-color: #0a0a0a;
-  color: #e5e2e1;
-  scroll-behavior: smooth;
-  font-family: 'Inter', sans-serif;
+  background-color: var(--off-white);
+  color: var(--navy-deep);
+  font-family: var(--font-inter), sans-serif;
+  overflow-x: hidden;
 }
 
-.structural-border {
-  border: 1px solid #262626;
+::selection {
+  background: var(--navy);
+  color: var(--off-white);
 }
 
 .material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
 }
 
-/* ── Responsive Layout Helpers ── */
-.section-padding {
-  padding: 128px 64px;
-}
-.container {
-  max-width: 1440px;
-  margin: 0 auto;
-}
-.hero-padding {
-  padding: 0 64px;
-}
-.nav-padding {
-  padding: 24px 64px;
-}
-.footer-padding {
-  padding: 64px;
+/* Blueprint grid pattern */
+.blueprint-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
-/* İki kolonlu grid */
-.two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-/* Hizmetler 4'lü grid */
-.four-col {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-}
-/* Projeler 3'lü grid */
-.three-col {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-/* Hakkımızda 2'li grid */
-.about-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px;
-  align-items: center;
-}
-/* Rozet grid */
-.badge-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+.blueprint-grid-light {
+  background-image:
+    linear-gradient(rgba(30, 58, 95, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 58, 95, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
-@media (max-width: 768px) {
-  .section-padding {
-    padding: 80px 20px;
-  }
-  .hero-padding {
-    padding: 0 20px;
-  }
-  .nav-padding {
-    padding: 16px 20px;
-  }
-  .footer-padding {
-    padding: 48px 20px;
-  }
-  .two-col,
-  .four-col,
-  .three-col,
-  .about-grid {
-    grid-template-columns: 1fr;
-  }
-  .about-grid {
-    gap: 40px;
-  }
-  .badge-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-  .hero-title {
-    font-size: 36px !important;
-  }
-  .section-title {
-    font-size: 32px !important;
-  }
-  .about-corner {
-    display: none;
-  }
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--off-white);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--navy);
 }

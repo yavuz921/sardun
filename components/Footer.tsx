@@ -10,20 +10,35 @@ const links = [
 
 export default function Footer() {
   return (
-    <footer style={{ backgroundColor: "#0e0e0e", borderTop: "1px solid #504536" }}>
-      <div className="mx-auto px-5 md:px-16 py-12 md:py-16 flex flex-col md:flex-row justify-between items-start gap-10" style={{ maxWidth: 1440 }}>
-        <div className="flex flex-col gap-4">
-          <Logo size={0.38} />
-          <p className="text-sm md:text-base max-w-xs" style={{ lineHeight: 1.6, color: "#d4c4b0", margin: 0 }}>
-            Mimari mükemmellik ve mühendislik disipliniyle geleceği inşa ediyoruz.
+    <footer style={{ backgroundColor: "#0f1d2e", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+      <div
+        className="mx-auto px-5 md:px-14 py-14 flex flex-col md:flex-row justify-between items-start md:items-center gap-10"
+        style={{ maxWidth: 1440 }}
+      >
+        <div className="flex flex-col gap-5">
+          <Logo variant="light" />
+          <p className="text-sm max-w-xs" style={{ lineHeight: 1.7, color: "#8fa3b8", margin: 0 }}>
+            Betonarme ve çelik yapılarda statik proje, analiz ve mühendislik danışmanlığı.
           </p>
         </div>
-        <nav className="flex flex-wrap gap-x-10 gap-y-4">
+
+        <nav className="flex flex-wrap gap-x-9 gap-y-3">
           {links.map((l) => (
-            <a key={l.href} href={l.href} className="text-sm md:text-base" style={{ color: "#d4c4b0", textDecoration: "none" }}>{l.label}</a>
+            <a
+              key={l.href}
+              href={l.href}
+              className="transition-colors duration-300 hover:text-white"
+              style={{ fontSize: 13.5, color: "#8fa3b8", textDecoration: "none" }}
+            >
+              {l.label}
+            </a>
           ))}
         </nav>
-        <div className="text-sm" style={{ color: "#d4c4b0" }}>© 2025 Sardun İnşaat</div>
+
+        <div className="flex flex-col gap-1 text-sm" style={{ color: "#8fa3b8" }}>
+          <span>Çankaya / Ankara</span>
+          <span>© 2026 Sardun Mühendislik &amp; Mimarlık</span>
+        </div>
       </div>
     </footer>
   );

@@ -1,34 +1,149 @@
 "use client";
+import { motion } from "framer-motion";
 import Image from "next/image";
 
-const projects = [
-  { img: "https://lh3.googleusercontent.com/aida-public/AB6AXuB2eEJXmoLf3c4PSuXhv77mGltvBkWtW4iJYoimdt4EOUk6D3NjsaNqkeR2c1_0HdIjRL0c--KWkN29eW2LehFJNZ3VOtxUCTyzh7ye9zq3P-vASnj1s0FMhfQx6fQZnjgooNB5-lziA768_hpDaWNzRRVyvkxAK0tnEPNiZAC-QbiZCnQv0rl3Y9DSB3J9NpsdUSYSVtW9MdFLrSRvWCvP6OpCEQrAahg9yF6bdvPO3bB_eawDT6VvkWXFhXUkwINT0UyJW5oJvE4", alt: "Lüks Rezidans Projesi", status: "DEVAM EDİYOR", statusColor: "#f9bc51", city: "İSTANBUL, TR", title: "Lüks Rezidans Projesi" },
-  { img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA5WpKFir2I72b9VWWzUMWErnuXt7jWQIpQhPYUtSfK7P86saRJiENmVMzGQg3WmmlWhmEaP4SP1oWrDZFCG0-bWTwQE9w_tHrj_DhoL91ivgxT2zQ2rsrRXVABecC9uOheVZEPN3lwV6KwotkBtouO5uVnp5IMUosmvMyn-kBJuq9ZXUCqUlc-huDBXyC76ilLa4kir8wKEXM1jtCYsCUB-1h0xJLoy-jyCx2YbIwEJihCj0lGqVh0pr6l6C_wqzStURBmXWiQa0g", alt: "Ticari İş Merkezi", status: "TAMAMLANDI", statusColor: "#e5e2e1", city: "ANKARA, TR", title: "Ticari İş Merkezi" },
-  { img: "https://lh3.googleusercontent.com/aida-public/AB6AXuB4AdnFMvxhwJt9m4GviIHAj-SLY-mW78cGFB5BPwRiuOgqhahHQghQeIGv2bWI-u_Xi3iNuRltFVgWO-UEZym8VHbJ3QDjYmcufTGn1KyUftT28jQadSO7dz1khBjw-S5Wl1arHd6zkq4ezdEUl7ScddKpYSJHCm8ngRKQbPSS5JqkERt2WCGJLutVHjBRK0BwNNaYlPFvrQq9LzoWHTo-mSXDtGM2k__G5MtKiUcMOe4gNDUV0qAfYdx3rxemoSUWyBdIixZ1LwQ", alt: "Tarihi Restorasyon", status: "TAMAMLANDI", statusColor: "#e5e2e1", city: "İZMİR, TR", title: "Tarihi Restorasyon" },
+const featured = {
+  img: "/projects/celik-hal.jpeg",
+  tag: "ÇELİK KONSTRÜKSİYON",
+  title: "Endüstriyel Hal Yapısı",
+  desc: "Geniş açıklıklı çelik hal yapısının tam yapısal modeli — çapraz stabilite elemanları, aşık sistemi ve temel bağlantı detaylarıyla birlikte tasarlandı.",
+};
+
+const others = [
+  {
+    img: "/projects/sap2000-analiz.jpeg",
+    tag: "SAP2000",
+    title: "Çelik Yapı Sonlu Eleman Analizi",
+    desc: "Deprem ve rüzgâr yükleri altında eleman bazlı kapasite kontrolü.",
+  },
+  {
+    img: "/projects/etabs-betonarme.jpeg",
+    tag: "ETABS",
+    title: "Betonarme Bina Modellemesi",
+    desc: "Çok katlı betonarme taşıyıcı sistemin kat bazlı analiz ve donatı tasarımı.",
+  },
+  {
+    img: "/projects/tekla-celik.jpeg",
+    tag: "TEKLA STRUCTURES",
+    title: "Çelik Platform Detaylandırma",
+    desc: "Bağlantı ve montaj detaylarına kadar üretime hazır BIM modeli.",
+  },
+  {
+    img: "/projects/temel-tasarim.jpeg",
+    tag: "GEOTEKNİK",
+    title: "Kazıklı Temel Tasarımı",
+    desc: "Zemin koşullarına göre kazıklı radye temel sistemi modellemesi.",
+  },
 ];
 
 export default function Projects() {
   return (
-    <section id="projeler" className="py-20 md:py-32 px-5 md:px-16" style={{ backgroundColor: "#0e0e0e" }}>
+    <section id="projeler" className="py-24 md:py-36 px-5 md:px-14" style={{ backgroundColor: "#ffffff" }}>
       <div className="mx-auto" style={{ maxWidth: 1440 }}>
-        <div className="flex justify-between items-center gap-4 mb-12 md:mb-16 flex-wrap">
-          <h2 className="text-3xl md:text-5xl font-semibold" style={{ lineHeight: 1.2, letterSpacing: "-0.01em", color: "#e5e2e1", margin: 0 }}>Seçkin Projelerimiz</h2>
-          <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#f9bc51" }}>02 / PROJELER</span>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16 md:mb-20">
+          <div>
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="flex items-center gap-4 mb-6"
+            >
+              <span style={{ width: 48, height: 1.5, backgroundColor: "#1e3a5f" }} />
+              <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.3em", textTransform: "uppercase", color: "#1e3a5f" }}>
+                02 — Projeler
+              </span>
+            </motion.div>
+            <motion.h2
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="text-4xl md:text-6xl font-extrabold"
+              style={{ lineHeight: 1.1, letterSpacing: "-0.02em", color: "#16293f", margin: 0 }}
+            >
+              Analizden sahaya.
+            </motion.h2>
+          </div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.25 }}
+            className="max-w-sm text-base"
+            style={{ lineHeight: 1.7, color: "#5a6b7d" }}
+          >
+            Her proje; modelleme, analiz ve raporlama aşamalarından geçerek üretime hazır hale gelir.
+          </motion.p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {projects.map((p) => (
-            <div key={p.title} className="cursor-pointer group">
-              <div className="relative overflow-hidden" style={{ aspectRatio: "3/4", border: "1px solid #262626" }}>
-                <Image src={p.img} alt={p.alt} fill className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
-                <div className="absolute bottom-0 left-0 p-4" style={{ backgroundColor: "rgba(19,19,19,0.9)", fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: p.statusColor }}>
-                  {p.status}
-                </div>
+
+        {/* Öne çıkan proje */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="group grid grid-cols-1 lg:grid-cols-5 mb-5 overflow-hidden"
+          style={{ backgroundColor: "#16293f" }}
+        >
+          <div className="relative lg:col-span-3 overflow-hidden" style={{ minHeight: 320 }}>
+            <Image
+              src={featured.img}
+              alt={featured.title}
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              unoptimized
+            />
+          </div>
+          <div className="lg:col-span-2 flex flex-col justify-center p-8 md:p-14 gap-5">
+            <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: "0.24em", color: "#d9a441" }}>
+              {featured.tag}
+            </span>
+            <h3 className="text-2xl md:text-4xl font-extrabold" style={{ color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.15, margin: 0 }}>
+              {featured.title}
+            </h3>
+            <p className="text-sm md:text-base" style={{ lineHeight: 1.75, color: "rgba(255,255,255,0.65)", margin: 0 }}>
+              {featured.desc}
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Diğer projeler */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {others.map((p, i) => (
+            <motion.div
+              key={p.title}
+              initial={{ opacity: 0, y: 44 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.65, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="group cursor-default"
+            >
+              <div className="relative overflow-hidden" style={{ aspectRatio: "4/3", border: "1px solid #e3e3de", backgroundColor: "#f5f5f2" }}>
+                <Image
+                  src={p.img}
+                  alt={p.title}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-108"
+                  unoptimized
+                />
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "linear-gradient(to top, rgba(22,41,63,0.75), transparent 55%)" }}
+                />
               </div>
-              <div className="mt-6">
-                <div className="mb-2" style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#f9bc51" }}>{p.city}</div>
-                <h3 className="text-2xl font-semibold" style={{ color: "#e5e2e1", margin: 0 }}>{p.title}</h3>
+              <div className="pt-5">
+                <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.22em", color: "#1e3a5f" }}>
+                  {p.tag}
+                </span>
+                <h3 className="text-lg font-bold mt-2 mb-2" style={{ color: "#16293f", letterSpacing: "-0.01em" }}>
+                  {p.title}
+                </h3>
+                <p className="text-sm" style={{ lineHeight: 1.65, color: "#5a6b7d", margin: 0 }}>
+                  {p.desc}
+                </p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
