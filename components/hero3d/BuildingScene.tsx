@@ -78,9 +78,10 @@ function LightRig({
 }) {
   useFrame((_, delta) => {
     const p = heroProgress.value;
-    // Phase 1: darkness. Light wakes gently as the grid begins to form.
-    const reveal = smoothstep(0.05, 0.3, p);
-    const toIndustrial = smoothstep(0.28, 0.56, p);
+    // Blueprint phase: darkness, lit only by the glowing wireframe itself.
+    // Ambient light wakes gently as real construction begins (~0.09).
+    const reveal = smoothstep(0.08, 0.34, p);
+    const toIndustrial = smoothstep(0.3, 0.58, p);
     const toWarm = easeInOut(smoothstep(0.75, 1.0, p)); // golden-hour arrives with final lighting
     const damp = 1 - Math.pow(0.02, delta);
     if (keyRef.current) {

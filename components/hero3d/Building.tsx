@@ -17,6 +17,11 @@ import { heroProgress } from "@/lib/heroProgress";
   ground floor wrapping an open, column-supported covered terrace, carrying
   a cantilevered all-glass upper volume above it.
 
+   0. Blueprint — the full structural drawing appears first: every
+      foundation, slab, column, beam and wall outline the engineer has
+      already planned, drawn as a glowing technical wireframe (the exact
+      same coordinates the solid model below uses — this IS the plan,
+      not a decoration).
    1. Foundation / ground platform
    2. Ground floor slab
    3. Structural columns (exposed, at the terrace)
@@ -30,6 +35,10 @@ import { heroProgress } from "@/lib/heroProgress";
   11. Natural stone cladding
   12. Architectural details (canopy, fascia, steps)
   13. Final lighting — soffit glow ignites, golden-hour settles in
+
+  Every wireframe line dissolves into its real, solid counterpart at the
+  exact moment that piece is built — the blueprint isn't a separate phase
+  that disappears, it's the same data being progressively realized.
 */
 
 function smoothstep(a: number, b: number, x: number) {
@@ -41,20 +50,22 @@ function lerp(a: number, b: number, t: number) {
 }
 
 type Stage = [number, number];
+// The blueprint holds, fully drawn and legible, from p=0 to ~0.09 —
+// nothing solid begins until the plan has actually been shown.
 const STAGE = {
-  foundation: [0.0, 0.075] as Stage,
-  floorSlab: [0.06, 0.14] as Stage,
-  columns: [0.12, 0.2] as Stage,
-  beams: [0.18, 0.27] as Stage,
-  secondSlab: [0.25, 0.34] as Stage,
-  walls: [0.32, 0.42] as Stage,
-  roofStructure: [0.4, 0.48] as Stage,
-  roof: [0.46, 0.55] as Stage,
-  windowFrames: [0.53, 0.61] as Stage,
-  glass: [0.59, 0.7] as Stage,
-  cladding: [0.68, 0.79] as Stage,
-  details: [0.77, 0.88] as Stage,
-  lighting: [0.86, 1.0] as Stage,
+  foundation: [0.09, 0.15] as Stage,
+  floorSlab: [0.13, 0.2] as Stage,
+  columns: [0.18, 0.25] as Stage,
+  beams: [0.23, 0.31] as Stage,
+  secondSlab: [0.29, 0.37] as Stage,
+  walls: [0.35, 0.44] as Stage,
+  roofStructure: [0.42, 0.49] as Stage,
+  roof: [0.47, 0.55] as Stage,
+  windowFrames: [0.53, 0.6] as Stage,
+  glass: [0.58, 0.68] as Stage,
+  cladding: [0.66, 0.77] as Stage,
+  details: [0.75, 0.87] as Stage,
+  lighting: [0.85, 1.0] as Stage,
 };
 
 // A vertical element rises from `baseY` (where it connects to the structure below it)
@@ -72,8 +83,7 @@ const STONE = { color: "#b6ac93", metalness: 0, roughness: 0.85 };
 const METAL_TRIM = { color: "#4a4d50", metalness: 0.8, roughness: 0.25 };
 
 export default function Building({ mobile }: { mobile: boolean }) {
-  const mysteryRef = useRef<THREE.Group>(null);
-  const particlesRef = useRef<THREE.Points>(null);
+  const blueprintRef = useRef<THREE.Group>(null);
   const foundationRef = useRef<THREE.Group>(null);
   const floorSlabRef = useRef<THREE.Group>(null);
   const columnsRef = useRef<THREE.Group>(null);
@@ -102,45 +112,6 @@ export default function Building({ mobile }: { mobile: boolean }) {
     return { gw, gd, gh, enclosedBackZ, enclosedFrontZ, uw, ud, uh, upperCenterZ, upperBackZ, upperFrontZ, roofW, roofD, roofT, totalH };
   }, []);
   const { gw, gd, gh, enclosedBackZ, enclosedFrontZ, uw, ud, uh, upperCenterZ, upperBackZ, upperFrontZ, roofW, roofD, roofT, totalH } = M;
-
-  // ── Ambient guide lines & particles — site survey, just before the foundation appears ──
-  const mysteryGeo = useMemo(() => {
-    const n = mobile ? 4 : 6;
-    const geos: THREE.BufferGeometry[] = [];
-    for (let i = 0; i < n; i++) {
-      const ang = (i / n) * Math.PI * 2;
-      const r = 1.4 + (i % 3) * 0.6;
-      const a = new THREE.Vector3(Math.cos(ang) * r, 0.15, Math.sin(ang) * r);
-      const b = new THREE.Vector3(Math.cos(ang + 0.5) * (r * 0.5), 0.4, Math.sin(ang + 0.5) * (r * 0.5));
-      const g = new THREE.BufferGeometry();
-      g.setFromPoints([a, b]);
-      geos.push(g);
-    }
-    return geos;
-  }, [mobile]);
-
-  const particleGeo = useMemo(() => {
-    const count = mobile ? 60 : 140;
-    const positions = new Float32Array(count * 3);
-    let seed = 11;
-    const rng = () => {
-      seed |= 0;
-      seed = (seed + 0x6d2b79f5) | 0;
-      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-    for (let i = 0; i < count; i++) {
-      const ang = rng() * Math.PI * 2;
-      const r = 1.0 + rng() * 2.6;
-      positions[i * 3] = Math.cos(ang) * r;
-      positions[i * 3 + 1] = 0.2 + rng() * 0.6;
-      positions[i * 3 + 2] = Math.sin(ang) * r;
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    return g;
-  }, [mobile]);
 
   // ── 1. Foundation / ground platform ──
   const foundation: VertEl[] = useMemo(
@@ -205,6 +176,34 @@ export default function Building({ mobile }: { mobile: boolean }) {
     [gh, uh, upperCenterZ, roofT, roofW, roofD]
   );
 
+  // ── 0. Blueprint — a technical wireframe built from the EXACT same coordinates
+  //     as the solid structure above; each line dissolves into its real
+  //     counterpart the instant that piece is actually built. ──
+  const blueprint = useMemo(() => {
+    const items: { geo: THREE.BufferGeometry; stageStart: number }[] = [];
+    const addVert = (el: VertEl) => {
+      const box = new THREE.BoxGeometry(el.args[0], el.args[1], el.args[2]);
+      box.translate(el.pos[0], el.baseY + el.height / 2, el.pos[1]);
+      items.push({ geo: new THREE.EdgesGeometry(box), stageStart: el.stage[0] });
+      box.dispose();
+    };
+    const addSpan = (el: SpanEl) => {
+      const box = new THREE.BoxGeometry(el.args[0], el.args[1], el.args[2]);
+      box.translate(el.pos[0], el.pos[1], el.pos[2]);
+      items.push({ geo: new THREE.EdgesGeometry(box), stageStart: el.stage[0] });
+      box.dispose();
+    };
+    foundation.forEach(addVert);
+    floorSlab.forEach(addVert);
+    columns.forEach(addVert);
+    beams.forEach(addSpan);
+    secondSlab.forEach(addVert);
+    walls.forEach(addVert);
+    roofStructure.forEach(addSpan);
+    roof.forEach(addVert);
+    return items;
+  }, [foundation, floorSlab, columns, beams, secondSlab, walls, roofStructure, roof]);
+
   // ── 9. Window frames — slim mullions outlining the glazing ──
   const frames: SimpleEl[] = useMemo(() => {
     const arr: SimpleEl[] = [];
@@ -260,17 +259,17 @@ export default function Building({ mobile }: { mobile: boolean }) {
   useFrame(() => {
     const p = heroProgress.value;
 
-    const surveyOpacity = smoothstep(0, 0.02, p) * (1 - smoothstep(0.05, 0.08, p));
-    if (mysteryRef.current) {
-      mysteryRef.current.children.forEach((child) => {
-        const mat = (child as THREE.Line).material as THREE.LineBasicMaterial;
-        mat.opacity = surveyOpacity;
+    // Blueprint: the whole plan reads clearly almost immediately, then each
+    // line dissolves the instant its real, solid piece begins to be built.
+    if (blueprintRef.current) {
+      const globalIn = smoothstep(0, 0.02, p);
+      blueprintRef.current.children.forEach((child, i) => {
+        const item = blueprint[i];
+        if (!item) return;
+        const mat = (child as THREE.LineSegments).material as THREE.LineBasicMaterial;
+        const localOut = smoothstep(item.stageStart, item.stageStart + 0.05, p);
+        mat.opacity = globalIn * (1 - localOut) * 0.85;
       });
-    }
-    if (particlesRef.current) {
-      const mat = particlesRef.current.material as THREE.PointsMaterial;
-      mat.opacity = surveyOpacity * 0.7;
-      particlesRef.current.rotation.y += 0.0004;
     }
 
     applyVertical(foundationRef.current, foundation, p);
@@ -297,18 +296,15 @@ export default function Building({ mobile }: { mobile: boolean }) {
 
   return (
     <group position={[0, -totalH / 2 + 0.3, 0]}>
-      <group ref={mysteryRef}>
-        {mysteryGeo.map((g, i) => (
-          <line key={i}>
-            <primitive object={g} attach="geometry" />
-            <lineBasicMaterial color="#cfe8ff" transparent opacity={0} />
-          </line>
+      {/* Blueprint — the structural engineer's drawing, in the exact coordinates of the real building */}
+      <group ref={blueprintRef}>
+        {blueprint.map((item, i) => (
+          <lineSegments key={i}>
+            <primitive object={item.geo} attach="geometry" />
+            <lineBasicMaterial color="#6fd0ff" transparent opacity={0} toneMapped={false} />
+          </lineSegments>
         ))}
       </group>
-      <points ref={particlesRef}>
-        <primitive object={particleGeo} attach="geometry" />
-        <pointsMaterial color="#dcefff" size={0.024} transparent opacity={0} depthWrite={false} sizeAttenuation />
-      </points>
 
       <group ref={foundationRef}>{foundation.map((e, i) => <VerticalMesh key={i} el={e} />)}</group>
       <group ref={floorSlabRef}>{floorSlab.map((e, i) => <VerticalMesh key={i} el={e} />)}</group>
