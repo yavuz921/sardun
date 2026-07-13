@@ -29,8 +29,9 @@ function CameraRig() {
     const damp = 1 - Math.pow(0.0012, delta);
     const drive = smoothstep(0.06, 1.0, p); // gizem evresinde durgunluk
 
-    const from = new THREE.Vector3(6.4, 1.6, 7.4);
-    const to = new THREE.Vector3(5.2, 3.1, 6.2);
+    // Kadraj, kantilever taşmasını (mimari fotoğrafçılık açısıyla) net gösterecek şekilde
+    const from = new THREE.Vector3(7.0, 1.3, 7.8);
+    const to = new THREE.Vector3(5.6, 2.6, 5.8);
     const base = from.clone().lerp(to, easeInOut(drive));
 
     // Fare parallax — çok ince, asla agresif
@@ -38,7 +39,7 @@ function CameraRig() {
     base.y += heroProgress.pointerY * 0.22;
 
     camera.position.lerp(base, damp);
-    target.current.lerp(new THREE.Vector3(0, 0.4 + drive * 0.5, 0), damp);
+    target.current.lerp(new THREE.Vector3(0.5, 0.5 + drive * 0.6, 0), damp);
     camera.lookAt(target.current);
   });
   return null;

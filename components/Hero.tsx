@@ -50,13 +50,16 @@ export default function Hero() {
     <section ref={sectionRef} id="anasayfa" style={{ position: "relative", height: "340vh", backgroundColor: "#0F1B2E" }}>
       {/* Sabitlenmiş sahne + arayüz */}
       <div className="sticky top-0 overflow-hidden" style={{ height: "100svh" }}>
-        {/* 3D Canvas */}
-        <div className="absolute inset-0">
+        {/* 3D Canvas — büyük ekranlarda sağ tarafa sabitlenir, metnin üstüne binmez */}
+        <div className="absolute inset-0 lg:left-[34%]">
           <BuildingScene active={active} />
         </div>
 
         {/* Derinlik vinyeti + alt geçiş */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(circle at 30% 40%, transparent 40%, rgba(15,29,46,0.55) 100%)" }} />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "linear-gradient(90deg, #0F1B2E 0%, rgba(15,27,46,0.85) 20%, transparent 46%, transparent 100%)" }}
+        />
         <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 160, background: "linear-gradient(to bottom, transparent, #0F1B2E)" }} />
 
         {/* Arayüz — tümü Framer Motion, canvas dışında */}
