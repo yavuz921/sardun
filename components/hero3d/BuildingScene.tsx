@@ -38,19 +38,19 @@ function CameraRig({ mobile, reducedMotion, structure }: { mobile: boolean; redu
     const eased = easeInOut(drive);
 
     const idleDrift = reducedMotion ? 0 : Math.sin(clock.elapsedTime * 0.04) * 0.035;
-    const theta = 0.82 + eased * 0.44 + idleDrift;
     const bridge = structure === "bridge";
+    const theta = bridge ? 0.46 + eased * 0.16 + idleDrift : 0.82 + eased * 0.44 + idleDrift;
     const radius = bridge
       ? mobile
-        ? lerp(28, 25, eased)
-        : lerp(22.5, 19, eased)
+        ? lerp(44, 39, eased)
+        : lerp(31, 26, eased)
       : mobile
         ? lerp(23, 20.5, eased)
         : lerp(19.5, 15.5, eased);
     const height = bridge
       ? mobile
-        ? lerp(8.2, 7.2, eased)
-        : lerp(7.5, 6, eased)
+        ? lerp(11, 9.5, eased)
+        : lerp(9, 7.2, eased)
       : mobile
         ? lerp(7.8, 6.8, eased)
         : lerp(7.2, 5.45, eased);
@@ -159,7 +159,7 @@ export default function BuildingScene({ active, reducedMotion, structure }: { ac
     >
       <Suspense fallback={null}>
         <color attach="background" args={["#0F1B2E"]} />
-        <fog attach="fog" args={["#0F1B2E", 16, 42]} />
+        <fog attach="fog" args={["#0F1B2E", structure === "bridge" ? 26 : 16, structure === "bridge" ? 62 : 42]} />
 
         <hemisphereLight ref={hemiLight} intensity={0.4} color="#cfe0f0" groundColor="#0F1B2E" />
         <directionalLight
@@ -185,7 +185,7 @@ export default function BuildingScene({ active, reducedMotion, structure }: { ac
         </Environment>
 
         <mesh position={[0, -2.19, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={[28, 28]} />
+          <planeGeometry args={structure === "bridge" ? [52, 38] : [28, 28]} />
           <meshStandardMaterial color="#101c2a" roughness={0.98} metalness={0.02} />
         </mesh>
 
@@ -194,7 +194,7 @@ export default function BuildingScene({ active, reducedMotion, structure }: { ac
         <ContactShadows
           position={[0, -2.17, 0]}
           opacity={mobile ? 0.35 : 0.55}
-          scale={15}
+          scale={structure === "bridge" ? 27 : 15}
           blur={2.4}
           far={6}
           resolution={mobile ? 256 : 512}

@@ -10,6 +10,7 @@ type Reveal = "vertical" | "x" | "z" | "simple";
 
 type BridgeElement = {
   position: [number, number, number];
+  rotation?: [number, number, number];
   args: [number, number, number];
   color: string;
   metalness: number;
@@ -21,13 +22,13 @@ type BridgeElement = {
 };
 
 const STAGE = {
-  foundation: [0.07, 0.2] as Stage,
-  piers: [0.18, 0.36] as Stage,
-  caps: [0.31, 0.45] as Stage,
-  girders: [0.4, 0.61] as Stage,
-  deck: [0.56, 0.73] as Stage,
-  barriers: [0.7, 0.87] as Stage,
-  details: [0.84, 1] as Stage,
+  foundation: [0.06, 0.18] as Stage,
+  piers: [0.15, 0.33] as Stage,
+  caps: [0.28, 0.42] as Stage,
+  girders: [0.37, 0.58] as Stage,
+  deck: [0.52, 0.7] as Stage,
+  barriers: [0.66, 0.83] as Stage,
+  details: [0.78, 1] as Stage,
 };
 
 const CONCRETE = { color: "#d3d1ca", metalness: 0.02, roughness: 0.84 };
@@ -35,10 +36,31 @@ const CONCRETE_DARK = { color: "#aaa8a1", metalness: 0.02, roughness: 0.9 };
 const STEEL = { color: "#aab6c1", metalness: 0.82, roughness: 0.24 };
 const ASPHALT = { color: "#252b31", metalness: 0.05, roughness: 0.94 };
 const SAFETY = { color: "#c4ccd3", metalness: 0.64, roughness: 0.3 };
+const CABLE = { color: "#f2f6f8", metalness: 0.88, roughness: 0.1 };
 
 function smoothstep(a: number, b: number, value: number) {
   const t = Math.min(1, Math.max(0, (value - a) / (b - a)));
   return t * t * (3 - 2 * t);
+}
+function memberBetween(
+  from: [number, number, number],
+  to: [number, number, number],
+  thickness: number,
+  depth: number,
+  stage: Stage,
+  material = STEEL,
+): BridgeElement {
+  const dx = to[0] - from[0];
+  const dy = to[1] - from[1];
+  const length = Math.sqrt(dx * dx + dy * dy);
+  return {
+    position: [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2, (from[2] + to[2]) / 2],
+    rotation: [0, 0, Math.atan2(dy, dx)],
+    args: [length, thickness, depth],
+    ...material,
+    stage,
+    reveal: "x",
+  };
 }
 
 export default function Bridge({ mobile }: { mobile: boolean }) {
@@ -47,135 +69,185 @@ export default function Bridge({ mobile }: { mobile: boolean }) {
 
   const elements = useMemo<BridgeElement[]>(() => {
     const items: BridgeElement[] = [];
-    const bentXs = [-3.8, 3.8];
-    const pierZs = [-1.08, 1.08];
+    const bridgeLength = 23.4;
+    const bentXs = [-7, 0, 7];
+    const frameZs = [-1.55, 1.55];
 
     bentXs.forEach((x) => {
-      pierZs.forEach((z) => {
-        items.push({
-          position: [x, -1.98, z],
-          args: [1.18, 0.28, 1.18],
-          ...CONCRETE_DARK,
-          stage: STAGE.foundation,
-          reveal: "vertical",
-          baseY: -2.12,
-          height: 0.28,
+      frameZs.forEach((z) => {
+        [-0.72, 0.72].forEach((offset) => {
+          items.push({
+            position: [x + offset, -1.98, z],
+            args: [1.05, 0.28, 1.05],
+            ...CONCRETE_DARK,
+            stage: STAGE.foundation,
+            reveal: "vertical",
+            baseY: -2.12,
+            height: 0.28,
+          });
         });
-        items.push({
-          position: [x, -0.69, z],
-          args: [0.58, 2.3, 0.58],
-          ...CONCRETE,
-          stage: STAGE.piers,
-          reveal: "vertical",
-          baseY: -1.84,
-          height: 2.3,
-        });
+        items.push(
+          memberBetween(
+            [x - 0.72, -1.84, z],
+            [x, 0.38, z],
+            0.46,
+            0.72,
+            STAGE.piers,
+            CONCRETE,
+          ),
+          memberBetween(
+            [x + 0.72, -1.84, z],
+            [x, 0.38, z],
+            0.46,
+            0.72,
+            STAGE.piers,
+            CONCRETE,
+          ),
+        );
       });
       items.push({
-        position: [x, 0.61, 0],
-        args: [0.72, 0.3, 4.55],
+        position: [x, 0.51, 0],
+        args: [1.72, 0.26, 5.35],
         ...CONCRETE,
         stage: STAGE.caps,
         reveal: "z",
       });
     });
 
-    [-6.55, 6.55].forEach((x) => {
+    [-11.25, 11.25].forEach((x) => {
       items.push({
-        position: [x, -0.87, 0],
-        args: [0.66, 2.5, 4.5],
+        position: [x, -0.72, 0],
+        args: [0.72, 2.8, 5.45],
         ...CONCRETE_DARK,
         stage: STAGE.foundation,
         reveal: "vertical",
         baseY: -2.12,
-        height: 2.5,
+        height: 2.8,
       });
     });
 
-    [-1.45, -0.5, 0.5, 1.45].forEach((z) => {
+    [-1.82, -0.61, 0.61, 1.82].forEach((z) => {
       items.push({
-        position: [0, 0.91, z],
-        args: [13.3, 0.34, 0.2],
+        position: [0, 0.72, z],
+        args: [23.05, 0.36, 0.24],
         ...STEEL,
         stage: STAGE.girders,
         reveal: "x",
       });
     });
 
-    [-3.8, 0, 3.8].forEach((x) => {
+    [-9.4, -7, -4.7, -2.35, 0, 2.35, 4.7, 7, 9.4].forEach((x) => {
       items.push({
-        position: [x, 0.91, 0],
-        args: [0.18, 0.3, 3.25],
+        position: [x, 0.72, 0],
+        args: [0.16, 0.3, 4.52],
         ...STEEL,
         stage: STAGE.girders,
         reveal: "z",
       });
     });
 
-    items.push({
-      position: [0, 1.18, 0],
-      args: [13.7, 0.28, 4],
-      ...CONCRETE,
-      stage: STAGE.deck,
-      reveal: "x",
-    });
-    items.push({
-      position: [0, 1.35, 0],
-      args: [13.45, 0.07, 3.68],
-      ...ASPHALT,
-      stage: STAGE.deck,
-      reveal: "x",
+    items.push(
+      {
+        position: [0, 1.03, 0],
+        args: [bridgeLength, 0.28, 5.18],
+        ...CONCRETE,
+        stage: STAGE.deck,
+        reveal: "x",
+      },
+      {
+        position: [0, 1.205, 0],
+        args: [23.12, 0.07, 4.78],
+        ...ASPHALT,
+        stage: STAGE.deck,
+        reveal: "x",
+      },
+    );
+
+    [-2.62, 2.62].forEach((z) => {
+      items.push(
+        {
+          position: [0, 0.9, z],
+          args: [23.48, 0.68, 0.14],
+          color: "#596b7a",
+          metalness: 0.72,
+          roughness: 0.3,
+          stage: STAGE.deck,
+          reveal: "x",
+        },
+        {
+          position: [0, 1.55, z],
+          args: [23.48, 0.62, 0.13],
+          ...SAFETY,
+          stage: STAGE.barriers,
+          reveal: "x",
+        },
+        {
+          position: [0, 1.89, z],
+          args: [23.48, 0.07, 0.08],
+          ...STEEL,
+          stage: STAGE.barriers,
+          reveal: "x",
+        },
+      );
     });
 
-    [-2.02, 2.02].forEach((z) => {
+    for (let x = -9.8; x <= 9.8; x += 1.75) {
       items.push({
-        position: [0, 1.68, z],
-        args: [13.72, 0.72, 0.16],
-        ...SAFETY,
-        stage: STAGE.barriers,
-        reveal: "x",
-      });
-      items.push({
-        position: [0, 2.08, z],
-        args: [13.72, 0.08, 0.08],
-        ...STEEL,
-        stage: STAGE.barriers,
-        reveal: "x",
-      });
-    });
-
-    for (let x = -5.4; x <= 5.4; x += 1.8) {
-      items.push({
-        position: [x, 1.405, 0],
-        args: [0.92, 0.025, 0.08],
-        color: "#e8e4d9",
+        position: [x, 1.25, 0],
+        args: [0.96, 0.025, 0.085],
+        color: "#eee9da",
         metalness: 0,
-        roughness: 0.76,
+        roughness: 0.74,
         stage: STAGE.details,
         reveal: "simple",
       });
     }
 
-    [-5.6, -2.8, 0, 2.8, 5.6].forEach((x) => {
-      [-2.05, 2.05].forEach((z) => {
-        items.push({
-          position: [x, 2.48, z],
-          args: [0.07, 0.82, 0.07],
-          ...STEEL,
-          stage: STAGE.details,
-          reveal: "vertical",
-          baseY: 2.08,
-          height: 0.82,
+    [-4.8, 4.8].forEach((pylonX) => {
+      const direction = Math.sign(pylonX);
+      const topX = pylonX + direction * 0.28;
+      const anchors =
+        direction < 0
+          ? [-10.1, -8.15, -6.35, -3.05, -1.15]
+          : [1.15, 3.05, 6.35, 8.15, 10.1];
+
+      [-2.74, 2.74].forEach((z) => {
+        items.push(
+          memberBetween(
+            [pylonX, 1.2, z],
+            [topX, 4.9, z],
+            0.28,
+            0.26,
+            STAGE.barriers,
+            STEEL,
+          ),
+        );
+
+        anchors.forEach((anchorX, index) => {
+          const anchorY = 1.56 + Math.abs(anchorX - pylonX) * 0.018;
+          items.push(
+            memberBetween(
+              [topX, 4.72 - index * 0.08, z],
+              [anchorX, anchorY, z],
+              0.055,
+              0.055,
+              STAGE.details,
+              CABLE,
+            ),
+          );
         });
-        items.push({
-          position: [x, 2.87, z * 0.94],
-          args: [0.12, 0.08, 0.48],
-          color: "#f0d2a0",
-          metalness: 0.28,
-          roughness: 0.35,
-          stage: STAGE.details,
-          reveal: "simple",
-        });
+      });
+    });
+
+    [-2.42, 2.42].forEach((z) => {
+      items.push({
+        position: [0, 0.52, z],
+        args: [22.8, 0.035, 0.055],
+        color: "#f0c889",
+        metalness: 0.32,
+        roughness: 0.32,
+        stage: STAGE.details,
+        reveal: "x",
       });
     });
 
@@ -187,6 +259,7 @@ export default function Bridge({ mobile }: { mobile: boolean }) {
       elements.map((element) => ({
         geometry: new THREE.EdgesGeometry(new THREE.BoxGeometry(...element.args)),
         position: element.position,
+        rotation: element.rotation,
         stage: element.stage,
       })),
     [elements],
@@ -233,7 +306,7 @@ export default function Bridge({ mobile }: { mobile: boolean }) {
     <group position={[0, -0.05, 0]}>
       <group ref={blueprintRef}>
         {blueprint.map((item, index) => (
-          <lineSegments key={index} position={item.position}>
+          <lineSegments key={index} position={item.position} rotation={item.rotation}>
             <primitive object={item.geometry} attach="geometry" />
             <lineBasicMaterial color={index % 5 === 0 ? "#bdd5e2" : "#79b5d4"} transparent opacity={0} toneMapped={false} />
           </lineSegments>
@@ -242,7 +315,7 @@ export default function Bridge({ mobile }: { mobile: boolean }) {
 
       <group ref={elementsRef}>
         {elements.map((element, index) => (
-          <mesh key={index} position={element.position} castShadow={!mobile} receiveShadow>
+          <mesh key={index} position={element.position} rotation={element.rotation} castShadow={!mobile} receiveShadow>
             <boxGeometry args={element.args} />
             <meshStandardMaterial
               color={element.color}

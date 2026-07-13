@@ -156,7 +156,13 @@ export default function Hero() {
       }}
     >
       <div className="sticky top-0 h-[100svh] overflow-hidden">
-        <div className="absolute inset-0 top-[9%] md:top-0 lg:left-[32%]">
+        <div
+          className={
+            structure === "bridge"
+              ? "absolute inset-0"
+              : "absolute inset-0 top-[9%] md:top-0 lg:left-[32%]"
+          }
+        >
           <BuildingScene active={active} reducedMotion={reducedMotion} structure={structure} />
         </div>
 
