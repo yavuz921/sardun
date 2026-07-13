@@ -1,11 +1,11 @@
 "use client";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import Image from "next/image";
+import Structure3D from "./Structure3D";
 
 const container = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.13, delayChildren: 0.35 } },
+  show: { transition: { staggerChildren: 0.13, delayChildren: 0.3 } },
 };
 const item = {
   hidden: { opacity: 0, y: 34 },
@@ -15,35 +15,44 @@ const item = {
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const imgScale = useTransform(scrollYProgress, [0, 1], [1, 1.18]);
-  const imgY = useTransform(scrollYProgress, [0, 1], [0, 120]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, -70]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const sceneOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   return (
     <section
       ref={ref}
       id="anasayfa"
-      className="relative flex items-end overflow-hidden"
+      className="relative flex items-center overflow-hidden"
       style={{ minHeight: "100svh", backgroundColor: "#0f1d2e" }}
     >
-      {/* Tam-ekran gerçek proje render — hafif zoom parallax */}
-      <motion.div className="absolute inset-0 z-0" style={{ scale: imgScale, y: imgY }}>
-        <Image src="/projects/celik-hal.jpeg" alt="Çelik yapı modeli" fill priority unoptimized className="object-cover" />
-        {/* Lacivert sinematik overlay */}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(105deg, rgba(15,29,46,0.94) 0%, rgba(15,29,46,0.78) 42%, rgba(15,29,46,0.35) 100%)" }} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #0f1d2e 2%, transparent 32%)" }} />
-      </motion.div>
-
-      {/* İnce üst çizgi vurgusu — tarayan animasyon */}
-      <motion.div
-        className="absolute top-0 left-0 h-[3px] z-10"
-        style={{ backgroundColor: "#d9a441" }}
-        initial={{ width: "0%" }}
-        animate={{ width: "100%" }}
-        transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+      {/* Arka plan derinlik gradyanları */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          background:
+            "radial-gradient(circle at 72% 42%, rgba(47,84,128,0.35), transparent 55%), radial-gradient(circle at 20% 80%, rgba(217,164,65,0.10), transparent 50%)",
+        }}
       />
 
+      {/* 3D dönen çelik yapı — sağ tarafta, mobilde arka planda ortalı */}
+      <motion.div
+        className="absolute inset-0 md:left-auto md:right-0 md:w-[58%] z-0"
+        style={{ opacity: sceneOpacity }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.4, delay: 0.4 }}
+      >
+        <Structure3D />
+      </motion.div>
+
+      {/* Mobilde 3D üstüne okunabilirlik için lacivert perde */}
+      <div className="absolute inset-0 z-[1] md:hidden" style={{ background: "linear-gradient(to right, rgba(15,29,46,0.82), rgba(15,29,46,0.5))" }} />
+
+      {/* Alt geçiş */}
+      <div className="absolute bottom-0 left-0 right-0 z-[2]" style={{ height: 150, background: "linear-gradient(to bottom, transparent, #0f1d2e)" }} />
+
+      {/* İçerik */}
       <motion.div
         variants={container}
         initial="hidden"
@@ -51,7 +60,7 @@ export default function Hero() {
         className="relative z-10 w-full px-5 md:px-14 mx-auto"
         style={{ maxWidth: 1440, y: contentY, opacity: contentOpacity }}
       >
-        <div className="max-w-3xl pb-24 md:pb-32">
+        <div className="max-w-2xl">
           <motion.div variants={item} className="flex items-center gap-4 mb-8">
             <motion.span
               style={{ height: 1.5, backgroundColor: "#d9a441", display: "inline-block" }}
@@ -67,7 +76,7 @@ export default function Hero() {
           <motion.h1
             variants={item}
             className="text-5xl md:text-7xl lg:text-8xl font-extrabold"
-            style={{ lineHeight: 1.02, letterSpacing: "-0.035em", color: "#ffffff", margin: 0 }}
+            style={{ lineHeight: 1.03, letterSpacing: "-0.035em", color: "#ffffff", margin: 0 }}
           >
             Hesaplanmış
             <br />
@@ -76,7 +85,7 @@ export default function Hero() {
 
           <motion.p
             variants={item}
-            className="text-base md:text-xl mt-8 max-w-xl"
+            className="text-base md:text-xl mt-8 max-w-lg"
             style={{ lineHeight: 1.7, color: "rgba(255,255,255,0.78)" }}
           >
             Betonarme ve çelik yapılarda statik proje, ileri yapısal analiz ve mühendislik

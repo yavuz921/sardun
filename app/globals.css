@@ -71,6 +71,37 @@ body {
   animation: hexDrift 34s linear infinite;
 }
 
+/* ── CSS 3D dönen çelik kule ── */
+@keyframes towerSpin {
+  from { transform: rotateX(-16deg) rotateY(0deg); }
+  to   { transform: rotateX(-16deg) rotateY(360deg); }
+}
+@keyframes towerFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-14px); }
+}
+.tower-scene {
+  perspective: 1100px;
+}
+.tower-float {
+  animation: towerFloat 6s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+.tower-spin {
+  animation: towerSpin 26s linear infinite;
+  transform-style: preserve-3d;
+}
+.tower-bar {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tower-spin, .tower-float, .hex-pattern-animated { animation: none; }
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
