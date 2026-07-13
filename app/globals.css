@@ -13,13 +13,21 @@
 
 html {
   scroll-behavior: smooth;
+  background: var(--navy-darker);
 }
 
 body {
+  margin: 0;
   background-color: var(--off-white);
   color: var(--navy-deep);
   font-family: var(--font-inter), sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+section[id] {
+  scroll-margin-top: 76px;
 }
 
 ::selection {
@@ -27,88 +35,118 @@ body {
   color: var(--off-white);
 }
 
+a,
+button,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #B9C2CD;
+  outline-offset: 4px;
+}
+
 .material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
 }
 
-/*
-  Prizmatik küp/hexagon dokusu — her hücre 3 yüzeyli izometrik küp gibi
-  okunacak şekilde tonlu dolgularla (düz çizgi değil, gölge/ışık farkı).
-  Koyu lacivert zeminler için.
-*/
-.hex-pattern {
-  background-color: var(--navy-deep);
+.premium-blueprint-grid {
   background-image:
-    linear-gradient(30deg, rgba(255,255,255,.045) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,.045) 87.5%, rgba(255,255,255,.045)),
-    linear-gradient(150deg, rgba(0,0,0,.22) 12%, transparent 12.5%, transparent 87%, rgba(0,0,0,.22) 87.5%, rgba(0,0,0,.22)),
-    linear-gradient(30deg, rgba(255,255,255,.045) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,.045) 87.5%, rgba(255,255,255,.045)),
-    linear-gradient(150deg, rgba(0,0,0,.22) 12%, transparent 12.5%, transparent 87%, rgba(0,0,0,.22) 87.5%, rgba(0,0,0,.22)),
-    linear-gradient(60deg, rgba(255,255,255,.075) 25%, transparent 25.5%, transparent 75%, rgba(255,255,255,.075) 75%, rgba(255,255,255,.075)),
-    linear-gradient(60deg, rgba(255,255,255,.075) 25%, transparent 25.5%, transparent 75%, rgba(255,255,255,.075) 75%, rgba(255,255,255,.075));
-  background-size: 88px 154px;
-  background-position: 0 0, 0 0, 44px 77px, 44px 77px, 0 0, 44px 77px;
+    linear-gradient(rgba(121, 181, 212, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(121, 181, 212, 0.1) 1px, transparent 1px),
+    linear-gradient(rgba(121, 181, 212, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(121, 181, 212, 0.04) 1px, transparent 1px);
+  background-size: 96px 96px, 96px 96px, 24px 24px, 24px 24px;
+  mask-image: radial-gradient(circle at 72% 45%, black 0%, rgba(0, 0, 0, 0.72) 38%, transparent 78%);
 }
 
-/* Aynı prizmatik doku — açık zeminler için (Hizmetler bölümü vb.) */
-.hex-pattern-light {
-  background-color: var(--off-white);
+.premium-noise {
+  opacity: 0.16;
   background-image:
-    linear-gradient(30deg, rgba(255,255,255,.7) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,.7) 87.5%, rgba(255,255,255,.7)),
-    linear-gradient(150deg, rgba(30,58,95,.06) 12%, transparent 12.5%, transparent 87%, rgba(30,58,95,.06) 87.5%, rgba(30,58,95,.06)),
-    linear-gradient(30deg, rgba(255,255,255,.7) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,.7) 87.5%, rgba(255,255,255,.7)),
-    linear-gradient(150deg, rgba(30,58,95,.06) 12%, transparent 12.5%, transparent 87%, rgba(30,58,95,.06) 87.5%, rgba(30,58,95,.06)),
-    linear-gradient(60deg, rgba(30,58,95,.045) 25%, transparent 25.5%, transparent 75%, rgba(30,58,95,.045) 75%, rgba(30,58,95,.045)),
-    linear-gradient(60deg, rgba(30,58,95,.045) 25%, transparent 25.5%, transparent 75%, rgba(30,58,95,.045) 75%, rgba(30,58,95,.045));
-  background-size: 88px 154px;
-  background-position: 0 0, 0 0, 44px 77px, 44px 77px, 0 0, 44px 77px;
+    radial-gradient(circle at 15% 20%, rgba(255,255,255,0.055) 0 0.7px, transparent 0.8px),
+    radial-gradient(circle at 75% 65%, rgba(255,255,255,0.035) 0 0.6px, transparent 0.75px);
+  background-size: 5px 5px, 7px 7px;
+  mix-blend-mode: soft-light;
 }
 
-@keyframes hexDrift {
-  from { background-position: 0 0, 0 0, 44px 77px, 44px 77px, 0 0, 44px 77px; }
-  to   { background-position: 0 -154px, 0 -154px, 44px -77px, 44px -77px, 0 -154px, 44px -77px; }
-}
-.hex-pattern-animated {
-  animation: hexDrift 34s linear infinite;
-}
-
-/* ── CSS 3D dönen çelik kule ── */
-@keyframes towerSpin {
-  from { transform: rotateX(-16deg) rotateY(0deg); }
-  to   { transform: rotateX(-16deg) rotateY(360deg); }
-}
-@keyframes towerFloat {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-14px); }
-}
-.tower-scene {
-  perspective: 1100px;
-}
-.tower-float {
-  animation: towerFloat 6s ease-in-out infinite;
-  transform-style: preserve-3d;
-}
-.tower-spin {
-  animation: towerSpin 26s linear infinite;
-  transform-style: preserve-3d;
-}
-.tower-bar {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform-style: preserve-3d;
-  backface-visibility: visible;
-}
-@media (prefers-reduced-motion: reduce) {
-  .tower-spin, .tower-float, .hex-pattern-animated { animation: none; }
+.premium-button {
+  display: inline-block;
+  min-width: 178px;
+  padding: 16px 28px;
+  border: 1px solid #B9C2CD;
+  background: #B9C2CD;
+  color: #16273B;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    background-color 240ms ease,
+    border-color 240ms ease,
+    color 240ms ease;
 }
 
-/* Custom scrollbar */
+.premium-button:hover {
+  background: #d3d9df;
+  border-color: #d3d9df;
+}
+
+.premium-button-ghost {
+  background: rgba(255, 255, 255, 0.015);
+  border-color: rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+  backdrop-filter: blur(8px);
+}
+
+.premium-button-ghost:hover {
+  background: rgba(255, 255, 255, 0.075);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 9px;
 }
+
 ::-webkit-scrollbar-track {
-  background: var(--off-white);
+  background: var(--navy-darker);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: var(--navy);
+  background: #526b84;
+  border: 2px solid var(--navy-darker);
+}
+
+@media (max-width: 640px) {
+  .premium-button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .premium-blueprint-grid {
+    background-size: 72px 72px, 72px 72px, 18px 18px, 18px 18px;
+    mask-image: linear-gradient(to bottom, black, transparent 82%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

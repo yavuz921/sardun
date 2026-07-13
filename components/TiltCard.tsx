@@ -21,7 +21,7 @@ export default function TiltCard({
   const glowY = useTransform(y, [-0.5, 0.5], [0, 100]);
   const glowBackground = useTransform([glowX, glowY], (latest) => {
     const [gx, gy] = latest as number[];
-    return `radial-gradient(circle at ${gx}% ${gy}%, rgba(217,164,65,0.14), transparent 60%)`;
+    return `radial-gradient(circle at ${gx}% ${gy}%, rgba(78,119,155,0.14), transparent 60%)`;
   });
 
   function handleMouseMove(e: MouseEvent<HTMLDivElement>) {

@@ -21,19 +21,19 @@ function useIsMobile() {
 // Cinematic drone-style orbit — slow, confident, never aggressive.
 // A gentle arc around the subject combined with a slow push-in, plus a
 // near-imperceptible autonomous drift so the camera never feels static.
-function CameraRig() {
+function CameraRig({ mobile, reducedMotion }: { mobile: boolean; reducedMotion: boolean }) {
   const { camera } = useThree();
-  const target = useRef(new THREE.Vector3(0, 0.4, 0));
+  const target = useRef(new THREE.Vector3(0, 0.15, 0));
   useFrame(({ clock }, delta) => {
     const p = heroProgress.value;
     const damp = 1 - Math.pow(0.0012, delta);
-    const drive = smoothstep(0.06, 1.0, p); // stillness during the mystery phase
+    const drive = smoothstep(0.05, 1.0, p);
     const eased = easeInOut(drive);
 
-    const idleDrift = Math.sin(clock.elapsedTime * 0.045) * 0.05;
-    const theta = 0.95 + eased * 0.42 + idleDrift; // slow orbital sweep
-    const radius = lerp(21.5, 16.8, eased); // slow push-in, drone descending
-    const height = lerp(8.3, 6.6, eased);
+    const idleDrift = reducedMotion ? 0 : Math.sin(clock.elapsedTime * 0.04) * 0.035;
+    const theta = 0.82 + eased * 0.44 + idleDrift;
+    const radius = mobile ? lerp(23, 20.5, eased) : lerp(19.5, 15.5, eased);
+    const height = mobile ? lerp(7.8, 6.8, eased) : lerp(7.2, 5.45, eased);
 
     const base = new THREE.Vector3(Math.cos(theta) * radius, height, Math.sin(theta) * radius);
 
@@ -42,7 +42,7 @@ function CameraRig() {
     base.y += heroProgress.pointerY * 0.28;
 
     camera.position.lerp(base, damp);
-    target.current.lerp(new THREE.Vector3(0, 0.15 + drive * 0.35, 0), damp);
+    target.current.lerp(new THREE.Vector3(0, 0.08 + drive * 0.18, 0), damp);
     camera.lookAt(target.current);
   });
   return null;
@@ -101,7 +101,7 @@ function LightRig({
 }
 
 // Sahne HTML kapsayıcısı dışından görünürlüğe göre frameloop kontrolü
-export default function BuildingScene({ active }: { active: boolean }) {
+export default function BuildingScene({ active, reducedMotion }: { active: boolean; reducedMotion: boolean }) {
   const mobile = useIsMobile();
   const keyLight = useRef<THREE.DirectionalLight>(null);
   const hemiLight = useRef<THREE.HemisphereLight>(null);
@@ -123,11 +123,16 @@ export default function BuildingScene({ active }: { active: boolean }) {
       dpr={mobile ? [1, 1.5] : [1, 2]}
       frameloop={active ? "always" : "never"}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-      camera={{ position: [12.51, 8.3, 17.49], fov: 30, near: 0.1, far: 100 }}
+      onCreated={({ gl }) => {
+        gl.toneMapping = THREE.ACESFilmicToneMapping;
+        gl.toneMappingExposure = 1.05;
+      }}
+      camera={{ position: [13.3, 7.2, 14.2], fov: mobile ? 35 : 32, near: 0.1, far: 100 }}
       style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
       onPointerMove={(e) => {
         const w = window.innerWidth || 1;
         const h = window.innerHeight || 1;
+        if (mobile || reducedMotion) return;
         heroProgress.pointerX = (e.clientX / w) * 2 - 1;
         heroProgress.pointerY = -((e.clientY / h) * 2 - 1);
       }}
@@ -159,19 +164,24 @@ export default function BuildingScene({ active }: { active: boolean }) {
           <Lightformer form="ring" intensity={1.3} position={[3, 6, -2]} scale={3} color="#fff4e0" />
         </Environment>
 
+        <mesh position={[0, -2.19, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+          <planeGeometry args={[28, 28]} />
+          <meshStandardMaterial color="#101c2a" roughness={0.98} metalness={0.02} />
+        </mesh>
+
         <Building mobile={mobile} />
 
         <ContactShadows
-          position={[0, -1.05, 0]}
+          position={[0, -2.17, 0]}
           opacity={mobile ? 0.35 : 0.55}
-          scale={12}
+          scale={15}
           blur={2.4}
           far={6}
           resolution={mobile ? 256 : 512}
           color="#050b14"
         />
 
-        <CameraRig />
+        <CameraRig mobile={mobile} reducedMotion={reducedMotion} />
         <AdaptiveDpr pixelated={false} />
       </Suspense>
     </Canvas>
