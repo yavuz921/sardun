@@ -42,7 +42,7 @@ function CameraRig() {
     base.y += heroProgress.pointerY * 0.28;
 
     camera.position.lerp(base, damp);
-    target.current.lerp(new THREE.Vector3(0, 0.3 + drive * 0.5, 0), damp);
+    target.current.lerp(new THREE.Vector3(0, 0.15 + drive * 0.35, 0), damp);
     camera.lookAt(target.current);
   });
   return null;
@@ -81,7 +81,7 @@ function LightRig({
     // Phase 1: darkness. Light wakes gently as the grid begins to form.
     const reveal = smoothstep(0.05, 0.3, p);
     const toIndustrial = smoothstep(0.28, 0.56, p);
-    const toWarm = easeInOut(smoothstep(0.6, 1.0, p));
+    const toWarm = easeInOut(smoothstep(0.75, 1.0, p)); // golden-hour arrives with final lighting
     const damp = 1 - Math.pow(0.02, delta);
     if (keyRef.current) {
       tmpColor.copy(COOL).lerp(INDUSTRIAL, toIndustrial).lerp(WARM, toWarm);
@@ -161,7 +161,7 @@ export default function BuildingScene({ active }: { active: boolean }) {
         <Building mobile={mobile} />
 
         <ContactShadows
-          position={[0, -3.8, 0]}
+          position={[0, -1.05, 0]}
           opacity={mobile ? 0.35 : 0.55}
           scale={12}
           blur={2.4}

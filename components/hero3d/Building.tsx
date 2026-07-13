@@ -5,98 +5,124 @@ import * as THREE from "three";
 import { heroProgress } from "@/lib/heroProgress";
 
 /*
-  The birth of architecture — ONE coherent object continuously unfolding.
+  A real construction sequence, in real engineering order. Every element is
+  authored ONCE at its true, final position — nothing ever travels sideways
+  or arrives from elsewhere. Vertical elements (slabs, columns, walls, roof)
+  rise upward from the exact point where they meet the structure beneath
+  them; beams grow outward from their own center to meet the columns they
+  connect. The building never assembles from scattered fragments — it
+  simply grows, in order, exactly where it belongs.
 
-  Every structural member begins collapsed into a single point of light (the
-  idea). As scroll progresses, every member travels outward along the same
-  kind of path — from that shared point toward its real, final structural
-  position — while a single global twist field (identical for every member
-  at a given height, at every instant) sweeps through the whole form. This
-  is what keeps the transformation legible as ONE evolving object rather
-  than scattered independent pieces: nothing moves along an arbitrary path,
-  everything answers to the same underlying field.
+  Final result: a modern luxury villa — a solid, grounded concrete-and-stone
+  ground floor wrapping an open, column-supported covered terrace, carrying
+  a cantilevered all-glass upper volume above it.
 
-    Idea            → collapsed to a single glowing point.
-    Emergence        → the point expands outward, coherently, into a
-                        precise structural lattice, briefly swept by a
-                        unified twisting field (parametric imagination).
-    Skeleton         → the twist relaxes; members settle into their exact
-                        final columns & beams.
-    Materialization  → members refine from glow into brushed steel;
-                        concrete and glass grow continuously into being,
-                        bottom-up; a slender spire ignites at the crown.
-    Masterpiece      → golden-hour light settles over the finished tower.
+   1. Foundation / ground platform
+   2. Ground floor slab
+   3. Structural columns (exposed, at the terrace)
+   4. Structural beams (perimeter ring, connecting the columns)
+   5. Second floor slab (the cantilevered glass volume's floor)
+   6. Exterior walls (concrete)
+   7. Roof structure (steel edge frame)
+   8. Roof slab
+   9. Window frames
+  10. Large glass panels
+  11. Natural stone cladding
+  12. Architectural details (canopy, fascia, steps)
+  13. Final lighting — soffit glow ignites, golden-hour settles in
 */
 
 function smoothstep(a: number, b: number, x: number) {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
   return t * t * (3 - 2 * t);
 }
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
 
-const EMERGE_START = 0.04;
-const EMERGE_END = 0.62;
-const TWIST_RISE: [number, number] = [0.16, 0.34];
-const TWIST_FALL: [number, number] = [0.46, 0.64];
-const METAL_START = 0.56;
-const METAL_END = 0.86;
+type Stage = [number, number];
+const STAGE = {
+  foundation: [0.0, 0.075] as Stage,
+  floorSlab: [0.06, 0.14] as Stage,
+  columns: [0.12, 0.2] as Stage,
+  beams: [0.18, 0.27] as Stage,
+  secondSlab: [0.25, 0.34] as Stage,
+  walls: [0.32, 0.42] as Stage,
+  roofStructure: [0.4, 0.48] as Stage,
+  roof: [0.46, 0.55] as Stage,
+  windowFrames: [0.53, 0.61] as Stage,
+  glass: [0.59, 0.7] as Stage,
+  cladding: [0.68, 0.79] as Stage,
+  details: [0.77, 0.88] as Stage,
+  lighting: [0.86, 1.0] as Stage,
+};
 
-const GLOW_COLOR = new THREE.Color("#dcefff");
-const STEEL_COLOR = new THREE.Color("#b9c2cc");
+// A vertical element rises from `baseY` (where it connects to the structure below it)
+type VertEl = { pos: [number, number]; baseY: number; height: number; args: [number, number, number]; color: string; metalness: number; roughness: number; stage: Stage };
+// A spanning element (beam) grows from its own fixed center along one axis, connecting what's on either side
+type SpanEl = { pos: [number, number, number]; args: [number, number, number]; axis: "x" | "z"; color: string; metalness: number; roughness: number; stage: Stage };
+// A simple reveal element (frame, detail) — fixed position, fades/settles into place
+type SimpleEl = { pos: [number, number, number]; rot?: [number, number, number]; args: [number, number, number]; color: string; metalness: number; roughness: number; stage: Stage };
+type GlassPanel = { pos: [number, number, number]; rot: [number, number, number]; w: number; h: number; stage: Stage };
 
-type Member = { pos: [number, number, number]; args: [number, number, number]; seed: number };
-type Volume = { pos: [number, number, number]; size: [number, number, number]; color: string; metalness: number; roughness: number; threshold: number };
-type GlassPanel = { pos: [number, number, number]; rot: [number, number, number]; w: number; h: number; threshold: number };
+const STEEL_STRUCTURE = { color: "#aab0b6", metalness: 0.7, roughness: 0.35 }; // raw structural frame
+const CONCRETE = { color: "#c9c6bf", metalness: 0, roughness: 0.9 };
+const CONCRETE_DARK = { color: "#b7b4ac", metalness: 0, roughness: 0.95 };
+const STONE = { color: "#b6ac93", metalness: 0, roughness: 0.85 };
+const METAL_TRIM = { color: "#4a4d50", metalness: 0.8, roughness: 0.25 };
 
 export default function Building({ mobile }: { mobile: boolean }) {
   const mysteryRef = useRef<THREE.Group>(null);
   const particlesRef = useRef<THREE.Points>(null);
-  const membersRef = useRef<THREE.Group>(null);
-  const concreteRef = useRef<THREE.Group>(null);
+  const foundationRef = useRef<THREE.Group>(null);
+  const floorSlabRef = useRef<THREE.Group>(null);
+  const columnsRef = useRef<THREE.Group>(null);
+  const beamsRef = useRef<THREE.Group>(null);
+  const secondSlabRef = useRef<THREE.Group>(null);
+  const wallsRef = useRef<THREE.Group>(null);
+  const roofStructureRef = useRef<THREE.Group>(null);
+  const roofRef = useRef<THREE.Group>(null);
+  const framesRef = useRef<THREE.Group>(null);
   const glassRef = useRef<THREE.Group>(null);
-  const spireBodyRef = useRef<THREE.Mesh>(null);
-  const spireTipRef = useRef<THREE.Mesh>(null);
+  const claddingRef = useRef<THREE.Group>(null);
+  const detailsRef = useRef<THREE.Group>(null);
+  const soffitRef = useRef<THREE.Mesh>(null);
 
-  // ── Massing — a refined stepped tower: plinth, shaft, two setbacks, spire ──
-  const massing = useMemo(() => {
-    const shaftFloors = mobile ? 5 : 7;
-    const midFloors = mobile ? 1 : 2;
-    const topFloors = 1;
-    const px = 1.3, pz = 1.1, pH = 1.05;
-    const sx = 1.0, sz = 0.85, sF = 0.55;
-    const mx = 0.82, mz = 0.7, mF = 0.55;
-    const tx = 0.62, tz = 0.53, tF = 0.55;
-    const spireH = mobile ? 0.6 : 1.05;
-    const shaftH = shaftFloors * sF;
-    const midH = midFloors * mF;
-    const topH = topFloors * tF;
-    const bodyH = pH + shaftH + midH + topH;
-    const totalH = bodyH + spireH;
-    const core = new THREE.Vector3(0, totalH * 0.42, 0);
-    return { shaftFloors, midFloors, topFloors, px, pz, pH, sx, sz, sF, mx, mz, mF, tx, tz, tF, spireH, shaftH, midH, topH, bodyH, totalH, core };
-  }, [mobile]);
-  const { shaftFloors, midFloors, px, pz, pH, sx, sz, sF, mx, mz, mF, tx, tz, tF, spireH, shaftH, midH, topH, bodyH, totalH, core } = massing;
+  // ── Villa massing ──
+  const M = useMemo(() => {
+    const gw = 5.6, gd = 3.8, gh = 1.15; // ground volume: width, depth, height
+    const enclosedBackZ = -gd / 2; // -1.9
+    const enclosedFrontZ = 0.3; // glazing line between living room and terrace
+    const uw = 3.4, ud = 2.6, uh = 1.05; // cantilevered upper (glass) volume
+    const upperCenterZ = 0.35;
+    const upperBackZ = upperCenterZ - ud / 2; // -0.95
+    const upperFrontZ = upperCenterZ + ud / 2; // 1.65
+    const roofW = uw + 0.5, roofD = ud + 0.5, roofT = 0.12;
+    const totalH = 0.22 + gh + uh + roofT; // podium + ground + upper + roof
+    return { gw, gd, gh, enclosedBackZ, enclosedFrontZ, uw, ud, uh, upperCenterZ, upperBackZ, upperFrontZ, roofW, roofD, roofT, totalH };
+  }, []);
+  const { gw, gd, gh, enclosedBackZ, enclosedFrontZ, uw, ud, uh, upperCenterZ, upperBackZ, upperFrontZ, roofW, roofD, roofT, totalH } = M;
 
-  // ── Ambient guide lines & particles — Phase 1 atmosphere, independent of the structure ──
+  // ── Ambient guide lines & particles — site survey, just before the foundation appears ──
   const mysteryGeo = useMemo(() => {
-    const n = mobile ? 4 : 7;
+    const n = mobile ? 4 : 6;
     const geos: THREE.BufferGeometry[] = [];
     for (let i = 0; i < n; i++) {
       const ang = (i / n) * Math.PI * 2;
-      const r = 1.0 + (i % 3) * 0.45;
-      const y0 = totalH * 0.3 + (i % 4) * totalH * 0.1;
-      const a = new THREE.Vector3(Math.cos(ang) * r, y0, Math.sin(ang) * r);
-      const b = new THREE.Vector3(Math.cos(ang + 0.6) * (r * 0.35), y0 + totalH * 0.22, Math.sin(ang + 0.6) * (r * 0.35));
+      const r = 1.4 + (i % 3) * 0.6;
+      const a = new THREE.Vector3(Math.cos(ang) * r, 0.15, Math.sin(ang) * r);
+      const b = new THREE.Vector3(Math.cos(ang + 0.5) * (r * 0.5), 0.4, Math.sin(ang + 0.5) * (r * 0.5));
       const g = new THREE.BufferGeometry();
       g.setFromPoints([a, b]);
       geos.push(g);
     }
     return geos;
-  }, [totalH, mobile]);
+  }, [mobile]);
 
   const particleGeo = useMemo(() => {
-    const count = mobile ? 80 : 200;
+    const count = mobile ? 60 : 140;
     const positions = new Float32Array(count * 3);
-    let seed = 7;
+    let seed = 11;
     const rng = () => {
       seed |= 0;
       seed = (seed + 0x6d2b79f5) | 0;
@@ -105,185 +131,172 @@ export default function Building({ mobile }: { mobile: boolean }) {
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
     for (let i = 0; i < count; i++) {
-      const theta = rng() * Math.PI * 2;
-      const phi = Math.acos(2 * rng() - 1);
-      const r = 0.5 + rng() * 1.8;
-      positions[i * 3] = Math.sin(phi) * Math.cos(theta) * r;
-      positions[i * 3 + 1] = core.y + Math.cos(phi) * r * 0.7;
-      positions[i * 3 + 2] = Math.sin(phi) * Math.sin(theta) * r;
+      const ang = rng() * Math.PI * 2;
+      const r = 1.0 + rng() * 2.6;
+      positions[i * 3] = Math.cos(ang) * r;
+      positions[i * 3 + 1] = 0.2 + rng() * 0.6;
+      positions[i * 3 + 2] = Math.sin(ang) * r;
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(positions, 3));
     return g;
-  }, [core, mobile]);
+  }, [mobile]);
 
-  // ── Structural members — final positions only; the journey is computed per-frame ──
-  const members: Member[] = useMemo(() => {
-    const arr: Member[] = [];
-    let seed = 0;
-    const push = (pos: [number, number, number], args: [number, number, number]) => arr.push({ pos, args, seed: seed++ });
-    const ring = (y: number, hx: number, hz: number, t = 0.08) => {
-      push([0, y, -hz], [hx * 2, t, t]);
-      push([0, y, hz], [hx * 2, t, t]);
-      push([-hx, y, 0], [t, t, hz * 2]);
-      push([hx, y, 0], [t, t, hz * 2]);
-    };
-    for (const x of [-px, px]) for (const z of [-pz, pz]) push([x, pH / 2, z], [0.18, pH, 0.18]);
-    ring(pH, px, pz, 0.12);
-    for (const x of [-sx, sx]) for (const z of [-sz, sz]) push([x, pH + shaftH / 2, z], [0.14, shaftH, 0.14]);
-    for (let f = 2; f <= shaftFloors; f += 2) ring(pH + f * sF, sx, sz);
-    const midBaseY = pH + shaftH;
-    for (const x of [-mx, mx]) for (const z of [-mz, mz]) push([x, midBaseY + midH / 2, z], [0.12, midH, 0.12]);
-    ring(midBaseY + midH, mx, mz, 0.08);
-    const topBaseY = midBaseY + midH;
-    for (const x of [-tx, tx]) for (const z of [-tz, tz]) push([x, topBaseY + topH / 2, z], [0.1, topH, 0.1]);
-    ring(topBaseY + topH, tx, tz, 0.06);
-    return arr;
-  }, [px, pz, pH, sx, sz, sF, mx, mz, tx, tz, shaftFloors, shaftH, midH, topH]);
+  // ── 1. Foundation / ground platform ──
+  const foundation: VertEl[] = useMemo(
+    () => [{ pos: [0, 0], baseY: -0.3, height: 0.22, args: [gw + 0.7, 0.22, gd + 0.7], ...CONCRETE_DARK, stage: STAGE.foundation }],
+    [gw, gd]
+  );
 
-  // ── Concrete & glass volumes — grow continuously into being, bottom-up ──
-  const volumes: Volume[] = useMemo(() => {
-    const arr: Volume[] = [];
-    const thr = (y: number) => 0.6 + (y / bodyH) * 0.2;
-    arr.push({ pos: [0, pH / 2, 0], size: [px * 2, pH, pz * 2], color: "#b7b4ac", metalness: 0, roughness: 0.95, threshold: thr(pH / 2) });
-    for (let f = 2; f <= shaftFloors; f += 2) {
-      const y = pH + f * sF;
-      arr.push({ pos: [0, y, 0], size: [sx * 2 + 0.06, 0.08, sz * 2 + 0.06], color: "#c9c6bf", metalness: 0.1, roughness: 0.85, threshold: thr(y) });
-    }
-    const midBaseY = pH + shaftH;
-    // Metallic trim band at the shaft → setback transition
-    arr.push({ pos: [0, midBaseY, 0], size: [sx * 2 + 0.16, 0.07, sz * 2 + 0.16], color: "#d7dade", metalness: 0.6, roughness: 0.28, threshold: thr(midBaseY) });
-    for (let f = 1; f <= midFloors; f++) {
-      const y = midBaseY + f * mF;
-      arr.push({ pos: [0, y, 0], size: [mx * 2 + 0.06, 0.08, mz * 2 + 0.06], color: "#c9c6bf", metalness: 0.1, roughness: 0.85, threshold: thr(y) });
-    }
-    const topBaseY = midBaseY + midH;
-    // Metallic trim band at the setback → crown transition
-    arr.push({ pos: [0, topBaseY, 0], size: [mx * 2 + 0.14, 0.07, mz * 2 + 0.14], color: "#d7dade", metalness: 0.6, roughness: 0.28, threshold: thr(topBaseY) });
-    arr.push({ pos: [0, topBaseY + tF, 0], size: [tx * 2 + 0.06, 0.08, tz * 2 + 0.06], color: "#c9c6bf", metalness: 0.1, roughness: 0.85, threshold: thr(topBaseY + tF) });
-    arr.push({ pos: [0, bodyH + 0.04, 0], size: [tx * 2 + 0.18, 0.08, tz * 2 + 0.18], color: "#aeb4b8", metalness: 0.35, roughness: 0.5, threshold: thr(bodyH) });
-    arr.push({ pos: [0, -0.06, 0], size: [px * 2 + 0.8, 0.12, pz * 2 + 0.8], color: "#b7b4ac", metalness: 0, roughness: 0.95, threshold: thr(0) });
-    return arr;
-  }, [px, pz, pH, sx, sz, sF, mx, mz, mF, tx, tz, tF, shaftFloors, midFloors, shaftH, midH, bodyH]);
+  // ── 2. Ground floor slab ──
+  const floorSlab: VertEl[] = useMemo(
+    () => [{ pos: [0, 0], baseY: 0, height: 0.1, args: [gw, 0.1, gd], ...CONCRETE, stage: STAGE.floorSlab }],
+    [gw, gd]
+  );
 
-  const glassPanels: GlassPanel[] = useMemo(() => {
-    const thr = (y: number) => 0.66 + (y / bodyH) * 0.2;
-    const shaftY = pH + shaftH / 2;
-    const midY = pH + shaftH + midH / 2;
-    const topY = pH + shaftH + midH + topH / 2;
-    const faces = (cx: number, cz: number, y: number, h: number, t: number): GlassPanel[] => [
-      { pos: [0, y, cz + 0.02], rot: [0, 0, 0], w: cx * 2, h, threshold: t },
-      { pos: [0, y, -cz - 0.02], rot: [0, Math.PI, 0], w: cx * 2, h, threshold: t },
-      { pos: [cx + 0.02, y, 0], rot: [0, Math.PI / 2, 0], w: cz * 2, h, threshold: t },
-      { pos: [-cx - 0.02, y, 0], rot: [0, -Math.PI / 2, 0], w: cz * 2, h, threshold: t },
-    ];
+  // ── 3. Structural columns — exposed, holding up the covered terrace ──
+  const columns: VertEl[] = useMemo(() => {
+    const xs = [-2.3, -0.75, 0.75, 2.3];
+    return xs.map((x) => ({ pos: [x, gd / 2 - 0.08], baseY: 0.1, height: gh - 0.1, args: [0.14, gh - 0.1, 0.14], ...STEEL_STRUCTURE, stage: STAGE.columns }));
+  }, [gd, gh]);
+
+  // ── 4. Structural beams — perimeter ring connecting the columns ──
+  const beams: SpanEl[] = useMemo(
+    () => [
+      { pos: [0, gh, gd / 2], args: [gw, 0.14, 0.14], axis: "x", ...STEEL_STRUCTURE, stage: STAGE.beams },
+      { pos: [0, gh, -gd / 2], args: [gw, 0.14, 0.14], axis: "x", ...STEEL_STRUCTURE, stage: STAGE.beams },
+      { pos: [-gw / 2, gh, 0], args: [0.14, 0.14, gd], axis: "z", ...STEEL_STRUCTURE, stage: STAGE.beams },
+      { pos: [gw / 2, gh, 0], args: [0.14, 0.14, gd], axis: "z", ...STEEL_STRUCTURE, stage: STAGE.beams },
+    ],
+    [gw, gd, gh]
+  );
+
+  // ── 5. Second floor slab — the cantilevered upper volume's floor ──
+  const secondSlab: VertEl[] = useMemo(
+    () => [{ pos: [0, upperCenterZ], baseY: gh, height: 0.12, args: [uw, 0.12, ud], ...CONCRETE, stage: STAGE.secondSlab }],
+    [gh, uw, ud, upperCenterZ]
+  );
+
+  // ── 6. Exterior walls ──
+  const walls: VertEl[] = useMemo(
+    () => [
+      { pos: [0, enclosedBackZ], baseY: 0.1, height: gh - 0.1, args: [gw, gh - 0.1, 0.14], ...CONCRETE, stage: STAGE.walls },
+      { pos: [-gw / 2, (enclosedBackZ + enclosedFrontZ) / 2], baseY: 0.1, height: gh - 0.1, args: [0.14, gh - 0.1, enclosedFrontZ - enclosedBackZ], ...CONCRETE, stage: STAGE.walls },
+      { pos: [gw / 2, (enclosedBackZ + enclosedFrontZ) / 2], baseY: 0.1, height: gh - 0.1, args: [0.14, gh - 0.1, enclosedFrontZ - enclosedBackZ], ...CONCRETE, stage: STAGE.walls },
+      { pos: [0, upperBackZ], baseY: gh + 0.12, height: uh - 0.12, args: [uw, uh - 0.12, 0.12], ...CONCRETE_DARK, stage: STAGE.walls },
+    ],
+    [gw, gh, enclosedBackZ, enclosedFrontZ, uw, uh, upperBackZ]
+  );
+
+  // ── 7. Roof structure — steel edge frame atop the glass volume ──
+  const roofStructure: SpanEl[] = useMemo(() => {
+    const y = gh + uh;
     return [
-      ...faces(sx, sz, shaftY, shaftH, thr(shaftY)),
-      ...faces(mx, mz, midY, midH, thr(midY)),
-      ...faces(tx, tz, topY, topH, thr(topY)),
-      { pos: [0, pH * 0.55, pz + 0.02], rot: [0, 0, 0], w: px * 1.3, h: pH * 0.75, threshold: thr(pH * 0.55) },
+      { pos: [0, y, upperFrontZ], args: [uw, 0.1, 0.1], axis: "x", ...STEEL_STRUCTURE, stage: STAGE.roofStructure },
+      { pos: [0, y, upperBackZ], args: [uw, 0.1, 0.1], axis: "x", ...STEEL_STRUCTURE, stage: STAGE.roofStructure },
+      { pos: [-uw / 2, y, upperCenterZ], args: [0.1, 0.1, ud], axis: "z", ...STEEL_STRUCTURE, stage: STAGE.roofStructure },
+      { pos: [uw / 2, y, upperCenterZ], args: [0.1, 0.1, ud], axis: "z", ...STEEL_STRUCTURE, stage: STAGE.roofStructure },
     ];
-  }, [pH, shaftH, midH, topH, sx, sz, mx, mz, tx, tz, px, pz, bodyH]);
+  }, [gh, uh, uw, ud, upperFrontZ, upperBackZ, upperCenterZ]);
 
-  const tmpV = useMemo(() => new THREE.Vector3(), []);
+  // ── 8. Roof slab ──
+  const roof: VertEl[] = useMemo(
+    () => [{ pos: [0, upperCenterZ], baseY: gh + uh, height: roofT, args: [roofW, roofT, roofD], color: "#aeb4b8", metalness: 0.3, roughness: 0.55, stage: STAGE.roof }],
+    [gh, uh, upperCenterZ, roofT, roofW, roofD]
+  );
 
-  useFrame((_, delta) => {
+  // ── 9. Window frames — slim mullions outlining the glazing ──
+  const frames: SimpleEl[] = useMemo(() => {
+    const arr: SimpleEl[] = [];
+    const groundY0 = 0.15, groundY1 = gh - 0.03;
+    for (const x of [-gw / 2 + 0.3, -gw / 6, gw / 6, gw / 2 - 0.3]) {
+      arr.push({ pos: [x, (groundY0 + groundY1) / 2, enclosedFrontZ + 0.015], args: [0.04, groundY1 - groundY0, 0.04], ...METAL_TRIM, stage: STAGE.windowFrames });
+    }
+    arr.push({ pos: [0, groundY1, enclosedFrontZ + 0.015], args: [gw - 0.3, 0.04, 0.04], ...METAL_TRIM, stage: STAGE.windowFrames });
+    const upperY0 = gh + 0.15, upperY1 = gh + uh - 0.06;
+    for (const x of [-uw / 2 + 0.25, 0, uw / 2 - 0.25]) {
+      arr.push({ pos: [x, (upperY0 + upperY1) / 2, upperFrontZ + 0.015], args: [0.035, upperY1 - upperY0, 0.035], ...METAL_TRIM, stage: STAGE.windowFrames });
+    }
+    return arr;
+  }, [gw, gh, uh, uw, enclosedFrontZ, upperFrontZ]);
+
+  // ── 10. Large glass panels ──
+  const glassPanels: GlassPanel[] = useMemo(
+    () => [
+      { pos: [0, (0.1 + gh) / 2, enclosedFrontZ + 0.02], rot: [0, 0, 0], w: gw - 0.2, h: gh - 0.2, stage: STAGE.glass },
+      { pos: [0, (gh + 0.12 + gh + uh) / 2, upperFrontZ + 0.02], rot: [0, 0, 0], w: uw - 0.2, h: uh - 0.14, stage: STAGE.glass },
+      { pos: [-uw / 2 - 0.02, (gh + 0.12 + gh + uh) / 2, upperCenterZ], rot: [0, Math.PI / 2, 0], w: ud - 0.2, h: uh - 0.14, stage: STAGE.glass },
+      { pos: [uw / 2 + 0.02, (gh + 0.12 + gh + uh) / 2, upperCenterZ], rot: [0, -Math.PI / 2, 0], w: ud - 0.2, h: uh - 0.14, stage: STAGE.glass },
+    ],
+    [gw, gh, uw, ud, uh, enclosedFrontZ, upperFrontZ, upperCenterZ]
+  );
+
+  // ── 11. Natural stone cladding — installed left to right across the back wall ──
+  const cladding: (SimpleEl & { order: number })[] = useMemo(() => {
+    const n = 3;
+    const panelW = gw / n;
+    return Array.from({ length: n }, (_, i) => ({
+      pos: [-gw / 2 + panelW * (i + 0.5), (0.1 + gh) / 2, enclosedBackZ - 0.02] as [number, number, number],
+      args: [panelW - 0.04, gh - 0.14, 0.035] as [number, number, number],
+      ...STONE,
+      stage: STAGE.cladding,
+      order: i,
+    }));
+  }, [gw, gh, enclosedBackZ]);
+
+  // ── 12. Architectural details ──
+  const details: SimpleEl[] = useMemo(
+    () => [
+      { pos: [-gw / 2 - 0.5, 1.0, enclosedBackZ + 0.6], args: [0.05, 0.7, 1.1], ...METAL_TRIM, stage: STAGE.details }, // entrance canopy support
+      { pos: [-gw / 2 - 0.25, 1.35, enclosedBackZ + 0.6], args: [0.06, 1.0, 0.9], color: "#c9c6bf", metalness: 0.1, roughness: 0.7, stage: STAGE.details, rot: [0, 0, Math.PI / 2] },
+      { pos: [0, roofT + gh + uh + 0.02, upperFrontZ], args: [roofW, 0.03, 0.06], ...METAL_TRIM, stage: STAGE.details }, // roof fascia (front)
+      { pos: [0, 0.04, gd / 2 + 0.4], args: [gw * 0.5, 0.08, 0.7], color: "#b7b4ac", metalness: 0, roughness: 0.9, stage: STAGE.details }, // terrace step
+    ],
+    [gw, gh, uh, gd, enclosedBackZ, upperFrontZ, roofW, roofT]
+  );
+
+  const soffitBaseY = gh + 0.005;
+
+  useFrame(() => {
     const p = heroProgress.value;
-    void delta;
 
-    // ── Ambient guide lines & particles — Phase 1 only ──
-    const ambientOpacity = smoothstep(0, 0.04, p) * (1 - smoothstep(0.12, 0.2, p));
+    const surveyOpacity = smoothstep(0, 0.02, p) * (1 - smoothstep(0.05, 0.08, p));
     if (mysteryRef.current) {
       mysteryRef.current.children.forEach((child) => {
         const mat = (child as THREE.Line).material as THREE.LineBasicMaterial;
-        mat.opacity = ambientOpacity;
+        mat.opacity = surveyOpacity;
       });
-      const breathe = Math.sin(performance.now() * 0.00022) * 0.02;
-      mysteryRef.current.rotation.y += (breathe - mysteryRef.current.rotation.y) * 0.02;
     }
     if (particlesRef.current) {
       const mat = particlesRef.current.material as THREE.PointsMaterial;
-      mat.opacity = ambientOpacity * 0.7;
-      particlesRef.current.rotation.y += 0.0006;
+      mat.opacity = surveyOpacity * 0.7;
+      particlesRef.current.rotation.y += 0.0004;
     }
 
-    // ── Members — one coherent field: shared origin, shared twist, shared timing ──
-    const twistAmount =
-      smoothstep(TWIST_RISE[0], TWIST_RISE[1], p) * (1 - smoothstep(TWIST_FALL[0], TWIST_FALL[1], p));
-    const metalT = smoothstep(METAL_START, METAL_END, p);
+    applyVertical(foundationRef.current, foundation, p);
+    applyVertical(floorSlabRef.current, floorSlab, p);
+    applyVertical(columnsRef.current, columns, p);
+    applySpan(beamsRef.current, beams, p);
+    applyVertical(secondSlabRef.current, secondSlab, p);
+    applyVertical(wallsRef.current, walls, p);
+    applySpan(roofStructureRef.current, roofStructure, p);
+    applyVertical(roofRef.current, roof, p);
+    applySimple(framesRef.current, frames, p);
+    applyGlass(glassRef.current, glassPanels, p);
+    applySimple(claddingRef.current, cladding, p);
+    applySimple(detailsRef.current, details, p);
 
-    if (membersRef.current) {
-      membersRef.current.children.forEach((child, i) => {
-        const m = members[i];
-        if (!m) return;
-        const mesh = child as THREE.Mesh;
-        const mat = mesh.material as THREE.MeshStandardMaterial;
-
-        // Every member emerges along the same core → final path, only staggered slightly in TIME
-        const stagger = (m.seed % 5) * 0.012;
-        const r = smoothstep(EMERGE_START + stagger, EMERGE_END + stagger, p);
-        tmpV.set(m.pos[0], m.pos[1], m.pos[2]).sub(core).multiplyScalar(r).add(core);
-
-        // A single global twist field — identical angle for every member at this height, this instant
-        const theta = (tmpV.y / totalH) * 1.1 * twistAmount;
-        const cosT = Math.cos(theta), sinT = Math.sin(theta);
-        const x = tmpV.x * cosT - tmpV.z * sinT;
-        const z = tmpV.x * sinT + tmpV.z * cosT;
-        mesh.position.set(x, tmpV.y, z);
-
-        const s = 0.28 + 0.72 * r;
-        mesh.scale.set(s, s, s);
-
-        const revealGlow = smoothstep(0.03, 0.2, p);
-        mat.emissiveIntensity = revealGlow * (1 - metalT) * 1.3 + 0.02;
-        mat.metalness = metalT * 0.92;
-        mat.roughness = 0.55 - metalT * 0.23;
-        mat.color.copy(GLOW_COLOR).lerp(STEEL_COLOR, metalT);
-      });
-    }
-
-    // ── Concrete & glass — grow continuously into being ──
-    if (concreteRef.current) {
-      concreteRef.current.children.forEach((child, i) => {
-        const v = volumes[i];
-        if (!v) return;
-        const mesh = child as THREE.Mesh;
-        const mat = mesh.material as THREE.MeshStandardMaterial;
-        const t = smoothstep(v.threshold - 0.06, v.threshold + 0.06, p);
-        mesh.scale.y = 0.05 + 0.95 * t;
-        mat.opacity = t;
-      });
-    }
-    if (glassRef.current) {
-      glassRef.current.children.forEach((child, i) => {
-        const g = glassPanels[i];
-        if (!g) return;
-        const mesh = child as THREE.Mesh;
-        const mat = mesh.material as THREE.Material & { opacity: number };
-        const t = smoothstep(g.threshold - 0.06, g.threshold + 0.06, p);
-        mesh.scale.y = 0.06 + 0.94 * t;
-        mat.opacity = t * 0.74;
-      });
-    }
-
-    // ── Spire — the final beat: a slender beacon igniting at the crown ──
-    const spireT = smoothstep(0.8, 0.94, p);
-    if (spireBodyRef.current) {
-      const mat = spireBodyRef.current.material as THREE.MeshStandardMaterial;
-      spireBodyRef.current.scale.y = 0.05 + 0.95 * spireT;
-      mat.opacity = spireT;
-    }
-    if (spireTipRef.current) {
-      const mat = spireTipRef.current.material as THREE.MeshStandardMaterial;
-      const glow = smoothstep(0.88, 1.0, p);
-      mat.opacity = spireT;
-      mat.emissiveIntensity = 0.4 + glow * 2.2;
+    // ── 13. Final lighting — a soffit glow ignites beneath the cantilever ──
+    if (soffitRef.current) {
+      const mat = soffitRef.current.material as THREE.MeshStandardMaterial;
+      const t = smoothstep(STAGE.lighting[0], STAGE.lighting[1], p);
+      mat.opacity = t * 0.9;
+      mat.emissiveIntensity = t * 1.6;
     }
   });
 
   return (
-    <group position={[0, -totalH / 2, 0]}>
-      {/* Phase 1 — ambient guide lines */}
+    <group position={[0, -totalH / 2 + 0.3, 0]}>
       <group ref={mysteryRef}>
         {mysteryGeo.map((g, i) => (
           <line key={i}>
@@ -292,34 +305,21 @@ export default function Building({ mobile }: { mobile: boolean }) {
           </line>
         ))}
       </group>
-
-      {/* Phase 1 — floating particles */}
       <points ref={particlesRef}>
         <primitive object={particleGeo} attach="geometry" />
-        <pointsMaterial color="#dcefff" size={0.026} transparent opacity={0} depthWrite={false} sizeAttenuation />
+        <pointsMaterial color="#dcefff" size={0.024} transparent opacity={0} depthWrite={false} sizeAttenuation />
       </points>
 
-      {/* One coherent field — idea → emergence → skeleton → refined steel */}
-      <group ref={membersRef}>
-        {members.map((m, i) => (
-          <mesh key={i} castShadow receiveShadow>
-            <boxGeometry args={m.args} />
-            <meshStandardMaterial transparent opacity={1} color="#dcefff" emissive="#bfe0ff" emissiveIntensity={0} metalness={0} roughness={0.55} />
-          </mesh>
-        ))}
-      </group>
+      <group ref={foundationRef}>{foundation.map((e, i) => <VerticalMesh key={i} el={e} />)}</group>
+      <group ref={floorSlabRef}>{floorSlab.map((e, i) => <VerticalMesh key={i} el={e} />)}</group>
+      <group ref={columnsRef}>{columns.map((e, i) => <VerticalMesh key={i} el={e} castShadow />)}</group>
+      <group ref={beamsRef}>{beams.map((e, i) => <SpanMesh key={i} el={e} castShadow />)}</group>
+      <group ref={secondSlabRef}>{secondSlab.map((e, i) => <VerticalMesh key={i} el={e} castShadow />)}</group>
+      <group ref={wallsRef}>{walls.map((e, i) => <VerticalMesh key={i} el={e} castShadow />)}</group>
+      <group ref={roofStructureRef}>{roofStructure.map((e, i) => <SpanMesh key={i} el={e} />)}</group>
+      <group ref={roofRef}>{roof.map((e, i) => <VerticalMesh key={i} el={e} castShadow />)}</group>
+      <group ref={framesRef}>{frames.map((e, i) => <SimpleMesh key={i} el={e} />)}</group>
 
-      {/* Concrete volumes — plinth, floor datums, metallic trim bands, roof cap, podium */}
-      <group ref={concreteRef}>
-        {volumes.map((v, i) => (
-          <mesh key={i} position={v.pos} castShadow receiveShadow>
-            <boxGeometry args={v.size} />
-            <meshStandardMaterial color={v.color} metalness={v.metalness} roughness={v.roughness} transparent opacity={0.001} />
-          </mesh>
-        ))}
-      </group>
-
-      {/* Glass curtain walls */}
       <group ref={glassRef}>
         {glassPanels.map((g, i) => (
           <mesh key={i} position={g.pos} rotation={g.rot}>
@@ -333,15 +333,98 @@ export default function Building({ mobile }: { mobile: boolean }) {
         ))}
       </group>
 
-      {/* Spire — a slender beacon, the closing beat */}
-      <mesh ref={spireBodyRef} position={[0, bodyH + spireH / 2, 0]}>
-        <coneGeometry args={[0.07, spireH, 8]} />
-        <meshStandardMaterial color="#c7ccd1" metalness={0.7} roughness={0.25} transparent opacity={0.001} />
-      </mesh>
-      <mesh ref={spireTipRef} position={[0, bodyH + spireH + 0.03, 0]}>
-        <sphereGeometry args={[0.045, 12, 12]} />
-        <meshStandardMaterial color="#ffe6bf" emissive="#ffcf94" emissiveIntensity={0} metalness={0.2} roughness={0.3} transparent opacity={0.001} />
+      <group ref={claddingRef}>{cladding.map((e, i) => <SimpleMesh key={i} el={e} />)}</group>
+      <group ref={detailsRef}>{details.map((e, i) => <SimpleMesh key={i} el={e} />)}</group>
+
+      {/* Soffit light strip — the closing beat, underside of the cantilever */}
+      <mesh ref={soffitRef} position={[0, soffitBaseY, upperCenterZ]} rotation={[Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[uw - 0.3, ud - 0.3]} />
+        <meshStandardMaterial color="#ffdca8" emissive="#ffcf94" emissiveIntensity={0} metalness={0} roughness={0.6} transparent opacity={0.001} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
+}
+
+// ── Reusable mesh components ──
+
+function VerticalMesh({ el, castShadow }: { el: VertEl; castShadow?: boolean }) {
+  return (
+    <mesh position={[el.pos[0], el.baseY, el.pos[1]]} castShadow={castShadow} receiveShadow>
+      <boxGeometry args={el.args} />
+      <meshStandardMaterial color={el.color} metalness={el.metalness} roughness={el.roughness} transparent opacity={0.001} />
+    </mesh>
+  );
+}
+function SpanMesh({ el, castShadow }: { el: SpanEl; castShadow?: boolean }) {
+  return (
+    <mesh position={el.pos} castShadow={castShadow} receiveShadow>
+      <boxGeometry args={el.args} />
+      <meshStandardMaterial color={el.color} metalness={el.metalness} roughness={el.roughness} transparent opacity={0.001} />
+    </mesh>
+  );
+}
+function SimpleMesh({ el }: { el: SimpleEl }) {
+  return (
+    <mesh position={el.pos} rotation={el.rot}>
+      <boxGeometry args={el.args} />
+      <meshStandardMaterial color={el.color} metalness={el.metalness} roughness={el.roughness} transparent opacity={0.001} />
+    </mesh>
+  );
+}
+
+// ── Per-frame growth application ──
+
+function applyVertical(g: THREE.Group | null, els: VertEl[], p: number) {
+  if (!g) return;
+  g.children.forEach((child, i) => {
+    const el = els[i];
+    if (!el) return;
+    const mesh = child as THREE.Mesh;
+    const mat = mesh.material as THREE.MeshStandardMaterial;
+    const t = smoothstep(el.stage[0], el.stage[1], p);
+    const s = Math.max(t, 0.015);
+    mesh.scale.y = s;
+    mesh.position.y = el.baseY + (el.height * s) / 2;
+    mat.opacity = t;
+  });
+}
+function applySpan(g: THREE.Group | null, els: SpanEl[], p: number) {
+  if (!g) return;
+  g.children.forEach((child, i) => {
+    const el = els[i];
+    if (!el) return;
+    const mesh = child as THREE.Mesh;
+    const mat = mesh.material as THREE.MeshStandardMaterial;
+    const t = smoothstep(el.stage[0], el.stage[1], p);
+    const s = Math.max(t, 0.015);
+    if (el.axis === "x") mesh.scale.x = s;
+    else mesh.scale.z = s;
+    mat.opacity = t;
+  });
+}
+function applySimple(g: THREE.Group | null, els: (SimpleEl & { order?: number })[], p: number) {
+  if (!g) return;
+  g.children.forEach((child, i) => {
+    const el = els[i];
+    if (!el) return;
+    const mesh = child as THREE.Mesh;
+    const mat = mesh.material as THREE.MeshStandardMaterial;
+    const stagger = (el.order ?? 0) * 0.03;
+    const t = smoothstep(el.stage[0] + stagger, el.stage[1] + stagger, p);
+    const s = lerp(0.82, 1, t);
+    mesh.scale.set(s, s, s);
+    mat.opacity = t;
+  });
+}
+function applyGlass(g: THREE.Group | null, panels: GlassPanel[], p: number) {
+  if (!g) return;
+  g.children.forEach((child, i) => {
+    const panel = panels[i];
+    if (!panel) return;
+    const mesh = child as THREE.Mesh;
+    const mat = mesh.material as THREE.Material & { opacity: number };
+    const t = smoothstep(panel.stage[0], panel.stage[1], p);
+    mesh.scale.y = lerp(0.9, 1, t);
+    mat.opacity = t * 0.74;
+  });
 }
