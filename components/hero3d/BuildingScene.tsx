@@ -12,8 +12,12 @@ function useIsMobile() {
     const mq = window.matchMedia("(max-width: 768px)");
     const on = () => setMobile(mq.matches);
     on();
-    mq.addEventListener("change", on);
-    return () => mq.removeEventListener("change", on);
+    if (mq.addEventListener) {
+      mq.addEventListener("change", on);
+      return () => mq.removeEventListener("change", on);
+    }
+    mq.addListener(on);
+    return () => mq.removeListener(on);
   }, []);
   return mobile;
 }

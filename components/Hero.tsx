@@ -90,18 +90,11 @@ export default function Hero() {
   const progressScale = useTransform(progress, [0, 1], [0.02, 1]);
 
   useMotionValueEvent(progress, "change", (value) => {
-    const nextValue = reducedMotion ? 1 : value;
-    heroProgress.value = nextValue;
-    const index = PHASE_BOUNDARIES.findIndex((boundary) => nextValue < boundary);
+    heroProgress.value = value;
+    const index = PHASE_BOUNDARIES.findIndex((boundary) => value < boundary);
     const safeIndex = index === -1 ? PHASES.length - 1 : index;
     setPhase((previous) => (previous === safeIndex ? previous : safeIndex));
   });
-
-  useEffect(() => {
-    if (!reducedMotion) return;
-    heroProgress.value = 1;
-    setPhase(PHASES.length - 1);
-  }, [reducedMotion]);
 
   useEffect(() => {
     const element = sectionRef.current;
@@ -123,7 +116,7 @@ export default function Hero() {
       aria-label="Sardun mühendislik yapı animasyonu"
       className="relative"
       style={{
-        height: reducedMotion ? "100svh" : "360vh",
+        height: "360vh",
         backgroundColor: "#0F1B2E",
       }}
     >
