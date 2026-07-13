@@ -39,18 +39,19 @@ function CameraRig({ mobile, reducedMotion, structure }: { mobile: boolean; redu
 
     const idleDrift = reducedMotion ? 0 : Math.sin(clock.elapsedTime * 0.04) * 0.035;
     const bridge = structure === "bridge";
-    const theta = bridge ? 0.46 + eased * 0.16 + idleDrift : 0.82 + eased * 0.44 + idleDrift;
+    const finale = bridge ? smoothstep(0.74, 1, p) : 0;
+    const theta = bridge ? 0.46 + eased * 0.12 + idleDrift : 0.82 + eased * 0.44 + idleDrift;
     const radius = bridge
       ? mobile
-        ? lerp(44, 39, eased)
-        : lerp(31, 26, eased)
+        ? lerp(44, 39, eased) - finale * 4.5
+        : lerp(31, 26, eased) - finale * 3.8
       : mobile
         ? lerp(23, 20.5, eased)
         : lerp(19.5, 15.5, eased);
     const height = bridge
       ? mobile
-        ? lerp(11, 9.5, eased)
-        : lerp(9, 7.2, eased)
+        ? lerp(11, 9.5, eased) - finale * 0.55
+        : lerp(9, 7.2, eased) - finale * 0.4
       : mobile
         ? lerp(7.8, 6.8, eased)
         : lerp(7.2, 5.45, eased);
@@ -62,7 +63,8 @@ function CameraRig({ mobile, reducedMotion, structure }: { mobile: boolean; redu
     base.y += heroProgress.pointerY * 0.28;
 
     camera.position.lerp(base, damp);
-    target.current.lerp(new THREE.Vector3(0, 0.08 + drive * 0.18, 0), damp);
+    const targetY = bridge ? lerp(0.28, 0.92, finale) : 0.08 + drive * 0.18;
+    target.current.lerp(new THREE.Vector3(0, targetY, 0), damp);
     camera.lookAt(target.current);
   });
   return null;
