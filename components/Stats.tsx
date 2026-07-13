@@ -27,7 +27,7 @@ const stats = [
 
 export default function Stats() {
   return (
-    <section style={{ backgroundColor: "#0f1d2e" }}>
+    <section style={{ backgroundColor: "#0F1B2E" }}>
       <div className="mx-auto px-5 md:px-14 py-14 md:py-20" style={{ maxWidth: 1440 }}>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
           {stats.map((s, i) => (

@@ -10,7 +10,7 @@ const links = [
 
 export default function Footer() {
   return (
-    <footer style={{ backgroundColor: "#0f1d2e", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+    <footer style={{ backgroundColor: "#0F1B2E", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
       <div
         className="mx-auto px-5 md:px-14 py-14 flex flex-col md:flex-row justify-between items-start md:items-center gap-10"
         style={{ maxWidth: 1440 }}

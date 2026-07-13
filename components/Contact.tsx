@@ -22,7 +22,7 @@ export default function Contact() {
   };
 
   return (
-    <section id="iletisim" className="relative py-24 md:py-36 px-5 md:px-14 overflow-hidden" style={{ backgroundColor: "#0f1d2e" }}>
+    <section id="iletisim" className="relative py-24 md:py-36 px-5 md:px-14 overflow-hidden" style={{ backgroundColor: "#0F1B2E" }}>
       <div className="relative mx-auto" style={{ maxWidth: 1440 }}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-24">
           {/* Sol taraf */}
@@ -34,8 +34,8 @@ export default function Contact() {
               transition={{ duration: 0.6 }}
               className="flex items-center gap-4 mb-6"
             >
-              <span style={{ width: 48, height: 1.5, backgroundColor: "#d9a441" }} />
-              <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.3em", textTransform: "uppercase", color: "#d9a441" }}>
+              <span style={{ width: 48, height: 1.5, backgroundColor: "#B9C2CD" }} />
+              <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.3em", textTransform: "uppercase", color: "#B9C2CD" }}>
                 04 — İletişim
               </span>
             </motion.div>
@@ -76,7 +76,7 @@ export default function Contact() {
                   <span
                     className="material-symbols-outlined flex items-center justify-center"
                     style={{
-                      color: "#d9a441", fontSize: 22, width: 52, height: 52,
+                      color: "#B9C2CD", fontSize: 22, width: 52, height: 52,
                       border: "1px solid rgba(255,255,255,0.15)",
                     }}
                   >
@@ -142,7 +142,7 @@ export default function Contact() {
                 <label style={labelStyle}>Konu</label>
                 <select style={{ ...inputStyle, appearance: "none" }}>
                   {["Statik Proje", "Çelik Yapı Tasarımı", "Analiz / Danışmanlık", "Diğer"].map((t) => (
-                    <option key={t} style={{ backgroundColor: "#16293f" }}>{t}</option>
+                    <option key={t} style={{ backgroundColor: "#16273B" }}>{t}</option>
                   ))}
                 </select>
               </div>
@@ -156,7 +156,7 @@ export default function Contact() {
                 whileTap={{ scale: 0.98 }}
                 className="w-full"
                 style={{
-                  backgroundColor: "#d9a441", color: "#16293f", padding: "18px",
+                  backgroundColor: "#B9C2CD", color: "#16273B", padding: "18px",
                   fontSize: 13, fontWeight: 800, letterSpacing: "0.16em",
                   textTransform: "uppercase", border: "none", cursor: "pointer",
                 }}

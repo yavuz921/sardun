@@ -60,7 +60,7 @@ export default function Projects() {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.1 }}
               className="text-4xl md:text-6xl font-extrabold"
-              style={{ lineHeight: 1.1, letterSpacing: "-0.02em", color: "#16293f", margin: 0 }}
+              style={{ lineHeight: 1.1, letterSpacing: "-0.02em", color: "#16273B", margin: 0 }}
             >
               Analizden sahaya.
             </motion.h2>
@@ -84,7 +84,7 @@ export default function Projects() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="group grid grid-cols-1 lg:grid-cols-5 mb-5 overflow-hidden"
-          style={{ backgroundColor: "#16293f" }}
+          style={{ backgroundColor: "#16273B" }}
         >
           <div className="relative lg:col-span-3 overflow-hidden" style={{ minHeight: 320 }}>
             <Image
@@ -96,7 +96,7 @@ export default function Projects() {
             />
           </div>
           <div className="lg:col-span-2 flex flex-col justify-center p-8 md:p-14 gap-5">
-            <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: "0.24em", color: "#d9a441" }}>
+            <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: "0.24em", color: "#B9C2CD" }}>
               {featured.tag}
             </span>
             <h3 className="text-2xl md:text-4xl font-extrabold" style={{ color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.15, margin: 0 }}>
@@ -119,7 +119,7 @@ export default function Projects() {
               transition={{ duration: 0.65, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
               className="group cursor-default"
             >
-              <div className="relative overflow-hidden" style={{ aspectRatio: "4/3", border: "1px solid #e3e3de", backgroundColor: "#f5f5f2" }}>
+              <div className="relative overflow-hidden" style={{ aspectRatio: "4/3", border: "1px solid #e3e3de", backgroundColor: "#F6F6F6" }}>
                 <Image
                   src={p.img}
                   alt={p.title}
@@ -136,7 +136,7 @@ export default function Projects() {
                 <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.22em", color: "#1e3a5f" }}>
                   {p.tag}
                 </span>
-                <h3 className="text-lg font-bold mt-2 mb-2" style={{ color: "#16293f", letterSpacing: "-0.01em" }}>
+                <h3 className="text-lg font-bold mt-2 mb-2" style={{ color: "#16273B", letterSpacing: "-0.01em" }}>
                   {p.title}
                 </h3>
                 <p className="text-sm" style={{ lineHeight: 1.65, color: "#5a6b7d", margin: 0 }}>

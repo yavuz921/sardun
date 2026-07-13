@@ -10,7 +10,7 @@ const principles = [
 
 export default function About() {
   return (
-    <section id="hakkimizda" className="relative py-24 md:py-36 px-5 md:px-14 overflow-hidden" style={{ backgroundColor: "#f5f5f2" }}>
+    <section id="hakkimizda" className="relative py-24 md:py-36 px-5 md:px-14 overflow-hidden" style={{ backgroundColor: "#F6F6F6" }}>
       {/* Arka plan logo dekoru */}
       <div className="absolute hidden xl:block" style={{ left: "-60px", bottom: "-40px", opacity: 0.04, width: 420 }}>
         <Image src="/logo-navy.png" alt="" width={420} height={252} style={{ width: "100%", height: "auto" }} unoptimized />
@@ -37,7 +37,7 @@ export default function About() {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.1 }}
               className="text-4xl md:text-6xl font-extrabold"
-              style={{ lineHeight: 1.12, letterSpacing: "-0.02em", color: "#16293f", margin: 0 }}
+              style={{ lineHeight: 1.12, letterSpacing: "-0.02em", color: "#16273B", margin: 0 }}
             >
               Sağlam yapı,
               <br />
@@ -75,7 +75,7 @@ export default function About() {
                   {p.icon}
                 </span>
                 <div>
-                  <h3 className="text-base font-bold mb-1.5" style={{ color: "#16293f" }}>{p.title}</h3>
+                  <h3 className="text-base font-bold mb-1.5" style={{ color: "#16273B" }}>{p.title}</h3>
                   <p className="text-sm" style={{ lineHeight: 1.65, color: "#5a6b7d", margin: 0 }}>{p.desc}</p>
                 </div>
               </motion.div>

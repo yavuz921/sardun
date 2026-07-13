@@ -2,13 +2,13 @@
 
 :root {
   --navy: #1e3a5f;
-  --navy-deep: #16293f;
-  --navy-darker: #0f1d2e;
-  --off-white: #f5f5f2;
+  --navy-deep: #16273B;
+  --navy-darker: #0F1B2E;
+  --off-white: #F6F6F6;
   --paper: #ffffff;
   --steel: #8fa3b8;
   --line: #2c4a6e;
-  --accent: #d9a441;
+  --accent: #B9C2CD;
 }
 
 html {

@@ -66,7 +66,7 @@ export default function Navbar() {
                 <motion.span
                   layoutId="nav-underline"
                   className="absolute left-0 right-0"
-                  style={{ bottom: -6, height: 2, backgroundColor: "#d9a441" }}
+                  style={{ bottom: -6, height: 2, backgroundColor: "#B9C2CD" }}
                 />
               )}
             </a>
@@ -135,7 +135,7 @@ export default function Navbar() {
                 transition={{ delay: links.length * 0.06 }}
                 className="text-center mt-4 mb-2"
                 style={{
-                  backgroundColor: "#d9a441", color: "#16293f", padding: "14px",
+                  backgroundColor: "#B9C2CD", color: "#16273B", padding: "14px",
                   fontSize: 12.5, fontWeight: 700, letterSpacing: "0.14em",
                   textTransform: "uppercase", textDecoration: "none",
                 }}

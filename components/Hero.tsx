@@ -44,7 +44,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="anasayfa" style={{ position: "relative", height: "340vh", backgroundColor: "#0f1d2e" }}>
+    <section ref={sectionRef} id="anasayfa" style={{ position: "relative", height: "340vh", backgroundColor: "#0F1B2E" }}>
       {/* Sabitlenmiş sahne + arayüz */}
       <div className="sticky top-0 overflow-hidden" style={{ height: "100svh" }}>
         {/* 3D Canvas */}
@@ -54,7 +54,7 @@ export default function Hero() {
 
         {/* Derinlik vinyeti + alt geçiş */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(circle at 30% 40%, transparent 40%, rgba(15,29,46,0.55) 100%)" }} />
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 160, background: "linear-gradient(to bottom, transparent, #0f1d2e)" }} />
+        <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 160, background: "linear-gradient(to bottom, transparent, #0F1B2E)" }} />
 
         {/* Arayüz — tümü Framer Motion, canvas dışında */}
         <div className="absolute inset-0 flex items-center pointer-events-none">
@@ -68,12 +68,12 @@ export default function Hero() {
             <div className="max-w-2xl pointer-events-auto">
               <motion.div variants={item} className="flex items-center gap-4 mb-8">
                 <motion.span
-                  style={{ height: 1.5, backgroundColor: "#d9a441", display: "inline-block" }}
+                  style={{ height: 1.5, backgroundColor: "#B9C2CD", display: "inline-block" }}
                   initial={{ width: 0 }}
                   animate={{ width: 56 }}
                   transition={{ duration: 0.8, delay: 0.5 }}
                 />
-                <span style={{ fontSize: 12.5, fontWeight: 600, letterSpacing: "0.3em", textTransform: "uppercase", color: "#d9a441" }}>
+                <span style={{ fontSize: 12.5, fontWeight: 600, letterSpacing: "0.3em", textTransform: "uppercase", color: "#B9C2CD" }}>
                   Mühendislik &amp; Mimarlık
                 </span>
               </motion.div>
@@ -85,7 +85,7 @@ export default function Hero() {
               >
                 Hesaplanmış
                 <br />
-                <span style={{ color: "#d9a441" }}>güven inşa ederiz.</span>
+                <span style={{ color: "#B9C2CD" }}>güven inşa ederiz.</span>
               </motion.h1>
 
               <motion.p
@@ -104,7 +104,7 @@ export default function Hero() {
                   whileTap={{ scale: 0.97 }}
                   className="text-center"
                   style={{
-                    backgroundColor: "#d9a441", color: "#16293f", padding: "18px 40px",
+                    backgroundColor: "#B9C2CD", color: "#16273B", padding: "18px 40px",
                     fontSize: 13, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none",
                   }}
                 >
@@ -147,7 +147,7 @@ export default function Hero() {
                 <motion.span
                   animate={{
                     width: phase === i ? 30 : 14,
-                    backgroundColor: phase >= i ? "#d9a441" : "rgba(255,255,255,0.25)",
+                    backgroundColor: phase >= i ? "#B9C2CD" : "rgba(255,255,255,0.25)",
                   }}
                   transition={{ duration: 0.4 }}
                   style={{ height: 2, display: "inline-block" }}

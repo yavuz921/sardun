@@ -27,7 +27,7 @@ const services = [
 
 export default function Services() {
   return (
-    <section id="hizmetler" className="relative py-24 md:py-36 px-5 md:px-14" style={{ backgroundColor: "#f5f5f2" }}>
+    <section id="hizmetler" className="relative py-24 md:py-36 px-5 md:px-14" style={{ backgroundColor: "#F6F6F6" }}>
       <div className="mx-auto" style={{ maxWidth: 1440 }}>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16 md:mb-20">
           <div className="max-w-2xl">
@@ -49,7 +49,7 @@ export default function Services() {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.1 }}
               className="text-4xl md:text-6xl font-extrabold"
-              style={{ lineHeight: 1.1, letterSpacing: "-0.02em", color: "#16293f", margin: 0 }}
+              style={{ lineHeight: 1.1, letterSpacing: "-0.02em", color: "#16273B", margin: 0 }}
             >
               Hesap bizim işimiz.
             </motion.h2>
@@ -88,7 +88,7 @@ export default function Services() {
                   >
                     {s.icon}
                   </span>
-                  <h3 className="text-lg font-bold mb-4" style={{ color: "#16293f", letterSpacing: "-0.01em" }}>
+                  <h3 className="text-lg font-bold mb-4" style={{ color: "#16273B", letterSpacing: "-0.01em" }}>
                     {s.title}
                   </h3>
                   <p className="text-sm" style={{ lineHeight: 1.7, color: "#5a6b7d" }}>

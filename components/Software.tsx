@@ -9,7 +9,7 @@ const tools = [
 
 export default function Software() {
   return (
-    <section className="py-20 md:py-28 px-5 md:px-14" style={{ backgroundColor: "#16293f" }}>
+    <section className="py-20 md:py-28 px-5 md:px-14" style={{ backgroundColor: "#16273B" }}>
       <div className="mx-auto" style={{ maxWidth: 1440 }}>
         <motion.div
           initial={{ opacity: 0 }}
@@ -18,8 +18,8 @@ export default function Software() {
           transition={{ duration: 0.6 }}
           className="flex items-center gap-4 mb-12"
         >
-          <span style={{ width: 48, height: 1.5, backgroundColor: "#d9a441" }} />
-          <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.3em", textTransform: "uppercase", color: "#d9a441" }}>
+          <span style={{ width: 48, height: 1.5, backgroundColor: "#B9C2CD" }} />
+          <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.3em", textTransform: "uppercase", color: "#B9C2CD" }}>
             Kullandığımız Teknolojiler
           </span>
         </motion.div>
