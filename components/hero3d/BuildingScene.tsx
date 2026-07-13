@@ -32,8 +32,8 @@ function CameraRig() {
 
     const idleDrift = Math.sin(clock.elapsedTime * 0.045) * 0.05;
     const theta = 0.95 + eased * 0.42 + idleDrift; // slow orbital sweep
-    const radius = lerp(19, 15.2, eased); // slow push-in, drone descending
-    const height = lerp(7.6, 6.1, eased);
+    const radius = lerp(21.5, 16.8, eased); // slow push-in, drone descending
+    const height = lerp(8.3, 6.6, eased);
 
     const base = new THREE.Vector3(Math.cos(theta) * radius, height, Math.sin(theta) * radius);
 
@@ -122,7 +122,7 @@ export default function BuildingScene({ active }: { active: boolean }) {
       dpr={mobile ? [1, 1.5] : [1, 2]}
       frameloop={active ? "always" : "never"}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-      camera={{ position: [11.05, 7.6, 15.45], fov: 30, near: 0.1, far: 100 }}
+      camera={{ position: [12.51, 8.3, 17.49], fov: 30, near: 0.1, far: 100 }}
       style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
       onPointerMove={(e) => {
         const w = window.innerWidth || 1;
@@ -161,7 +161,7 @@ export default function BuildingScene({ active }: { active: boolean }) {
         <Building mobile={mobile} />
 
         <ContactShadows
-          position={[0, -3.35, 0]}
+          position={[0, -3.8, 0]}
           opacity={mobile ? 0.35 : 0.55}
           scale={12}
           blur={2.4}
