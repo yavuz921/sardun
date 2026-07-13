@@ -7,7 +7,9 @@ import { heroProgress } from "@/lib/heroProgress";
 // WebGL sahnesi yalnızca istemcide (SSR kapalı) — hero'ya izole
 const BuildingScene = dynamic(() => import("./hero3d/BuildingScene"), { ssr: false });
 
-const PHASES = ["Blueprint", "Çelik İskelet", "Betonarme", "Cam Cephe", "Tamamlandı"];
+const PHASES = ["Gizem", "Hassas Izgara", "Akışkan Form", "Yapısal İskelet", "Beton & Cam", "Nihai Eser"];
+// Her aşamanın ekranda baskın olduğu scroll aralığı (Building.tsx'teki evre pencereleriyle eşleşir)
+const PHASE_BOUNDARIES = [0.1, 0.28, 0.46, 0.62, 0.82, 1.01];
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.13, delayChildren: 0.25 } } };
 const item = {
@@ -27,8 +29,9 @@ export default function Hero() {
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     heroProgress.value = v;
-    const idx = Math.min(PHASES.length - 1, Math.floor(v * PHASES.length));
-    setPhase((prev) => (prev === idx ? prev : idx));
+    const idx = PHASE_BOUNDARIES.findIndex((b) => v < b);
+    const safeIdx = idx === -1 ? PHASES.length - 1 : idx;
+    setPhase((prev) => (prev === safeIdx ? prev : safeIdx));
   });
 
   // Hero görünür değilken 3D render'ı durdur (batarya + performans, izolasyon)

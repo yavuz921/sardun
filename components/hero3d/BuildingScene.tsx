@@ -18,28 +18,35 @@ function useIsMobile() {
   return mobile;
 }
 
-// Sinematik kamera + fare parallax — asla abartısız, ölçülü hareket
+// Sinematik kamera + fare parallax — asla abartısız, ölçülü hareket.
+// Evre 1 (gizem) boyunca kamera neredeyse hareketsiz kalır; hareket ancak
+// ızgara belirmeye başladığında (drive eğrisi) yavaşça uyanır.
 function CameraRig() {
   const { camera } = useThree();
   const target = useRef(new THREE.Vector3(0, 0.4, 0));
   useFrame((_, delta) => {
     const p = heroProgress.value;
-    const damp = 1 - Math.pow(0.0015, delta);
+    const damp = 1 - Math.pow(0.0012, delta);
+    const drive = smoothstep(0.06, 1.0, p); // gizem evresinde durgunluk
 
-    // Başlangıç (blueprint genel bakış) → bitiş (zarif 3/4 kadraj) — küçük yol
     const from = new THREE.Vector3(6.4, 1.6, 7.4);
     const to = new THREE.Vector3(5.2, 3.1, 6.2);
-    const base = from.clone().lerp(to, easeInOut(p));
+    const base = from.clone().lerp(to, easeInOut(drive));
 
-    // Fare parallax — çok ince
-    base.x += heroProgress.pointerX * 0.5;
-    base.y += heroProgress.pointerY * 0.35;
+    // Fare parallax — çok ince, asla agresif
+    base.x += heroProgress.pointerX * 0.32;
+    base.y += heroProgress.pointerY * 0.22;
 
     camera.position.lerp(base, damp);
-    target.current.lerp(new THREE.Vector3(0, 0.4 + p * 0.5, 0), damp);
+    target.current.lerp(new THREE.Vector3(0, 0.4 + drive * 0.5, 0), damp);
     camera.lookAt(target.current);
   });
   return null;
+}
+
+function smoothstep(a: number, b: number, x: number) {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
 }
 
 function easeInOut(x: number) {
@@ -61,15 +68,20 @@ function LightRig({
 }) {
   useFrame((_, delta) => {
     const p = heroProgress.value;
-    const warmth = easeInOut(Math.min(1, Math.max(0, (p - 0.5) / 0.5))); // 0.5'ten sonra ısınır
+    // Evre 1: karanlık. Işık, ızgara belirdikçe (0.05–0.32) nazikçe uyanır.
+    const reveal = smoothstep(0.05, 0.32, p);
+    // Evre 5'ten itibaren (0.55–1.0) golden-hour sıcaklığı devreye girer.
+    const warmth = easeInOut(smoothstep(0.55, 1.0, p));
     const damp = 1 - Math.pow(0.02, delta);
     if (keyRef.current) {
       keyRef.current.color.lerpColors(COOL, WARM, warmth * 0.85);
-      const targetInt = 1.4 + warmth * 1.4;
+      const targetInt = 0.1 + reveal * 1.5 + warmth * 1.4;
       keyRef.current.intensity += (targetInt - keyRef.current.intensity) * damp;
     }
     if (hemiRef.current) {
       hemiRef.current.color.lerpColors(HEMI_COOL, HEMI_WARM, warmth * 0.7);
+      const targetHemiInt = 0.05 + reveal * 0.35;
+      hemiRef.current.intensity += (targetHemiInt - hemiRef.current.intensity) * damp;
     }
   });
   return null;
