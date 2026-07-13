@@ -54,34 +54,34 @@ const BUILDING_PHASES = [
 ];
 const BRIDGE_PHASES = [
   {
-    label: "Aks & G?zerg?h",
+    label: "Aks & G\u00fczerg\u00e2h",
     meta: "01 / Teknik model",
-    description: "?st ge?idin a??kl?klar?, ta??y?c? akslar? ve yol geometrisi m?hendislik ?izgileriyle kurulur.",
+    description: "\u00dcst ge\u00e7idin a\u00e7\u0131kl\u0131klar\u0131, ta\u015f\u0131y\u0131c\u0131 akslar\u0131 ve yol geometrisi m\u00fchendislik \u00e7izgileriyle kurulur.",
   },
   {
     label: "Temeller",
     meta: "02 / Zemin sistemi",
-    description: "Kenar mesnetleri ve orta ayak temelleri y?kleri g?venle zemine aktaracak ?ekilde olu?ur.",
+    description: "Kenar mesnetleri ve orta ayak temelleri y\u00fckleri g\u00fcvenle zemine aktaracak \u015fekilde olu\u015fur.",
   },
   {
-    label: "Ayak & Ba?l?klar",
+    label: "Ayak & Ba\u015fl\u0131klar",
     meta: "03 / Betonarme sistem",
-    description: "K?pr? ayaklar? y?kselir, ba?l?k kiri?leri tabliye sistemini kar??lamaya haz?rlan?r.",
+    description: "K\u00f6pr\u00fc ayaklar\u0131 y\u00fckselir, ba\u015fl\u0131k kiri\u015fleri tabliye sistemini kar\u015f\u0131lamaya haz\u0131rlan\u0131r.",
   },
   {
-    label: "Ana Kiri?ler",
-    meta: "04 / ?elik sistem",
-    description: "Boyuna ana kiri?ler ve enine ba?lant?lar a??kl?klar boyunca ta??y?c? omurgay? tamamlar.",
+    label: "Ana Kiri\u015fler",
+    meta: "04 / \u00c7elik sistem",
+    description: "Boyuna ana kiri\u015fler ve enine ba\u011flant\u0131lar a\u00e7\u0131kl\u0131klar boyunca ta\u015f\u0131y\u0131c\u0131 omurgay\u0131 tamamlar.",
   },
   {
     label: "Tabliye & Yol",
-    meta: "05 / ?styap?",
-    description: "Betonarme tabliye, asfalt y?zey ve g?venlik bariyerleri ta??y?c? sistemin ?zerine yerle?ir.",
+    meta: "05 / \u00dcstyap\u0131",
+    description: "Betonarme tabliye, asfalt y\u00fczey ve g\u00fcvenlik bariyerleri ta\u015f\u0131y\u0131c\u0131 sistemin \u00fczerine yerle\u015fir.",
   },
   {
-    label: "Nihai ?st Ge?it",
+    label: "Nihai \u00dcst Ge\u00e7it",
     meta: "06 / Teslim",
-    description: "?erit ?izgileri, korkuluklar ve ayd?nlatma elemanlar?yla ?st ge?it kullan?ma haz?r h?le gelir.",
+    description: "\u015eerit \u00e7izgileri, korkuluklar ve ayd\u0131nlatma elemanlar\u0131yla \u00fcst ge\u00e7it kullan\u0131ma haz\u0131r h\u00e2le gelir.",
   },
 ];
 
@@ -200,11 +200,11 @@ export default function Hero() {
         <div
           className="absolute right-5 top-36 z-20 flex overflow-hidden border border-white/20 bg-[#0F1B2E]/70 p-1 backdrop-blur-md md:right-14 md:top-40"
           role="group"
-          aria-label="3D yap? t?r?"
+          aria-label={"3D yap\u0131 t\u00fcr\u00fc"}
         >
           {([
-            ["building", "Yap?"],
-            ["bridge", "?st Ge?it"],
+            ["building", "Yap\u0131"],
+            ["bridge", "\u00dcst Ge\u00e7it"],
           ] as const).map(([value, label]) => {
             const selected = structure === value;
             return (
