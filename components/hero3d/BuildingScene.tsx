@@ -4,7 +4,10 @@ import { Environment, Lightformer, ContactShadows, AdaptiveDpr } from "@react-th
 import { useRef, useEffect, useState, Suspense } from "react";
 import * as THREE from "three";
 import Building from "./Building";
+import Bridge from "./Bridge";
 import { heroProgress } from "@/lib/heroProgress";
+
+export type StructureKind = "building" | "bridge";
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(false);
@@ -25,7 +28,7 @@ function useIsMobile() {
 // Cinematic drone-style orbit — slow, confident, never aggressive.
 // A gentle arc around the subject combined with a slow push-in, plus a
 // near-imperceptible autonomous drift so the camera never feels static.
-function CameraRig({ mobile, reducedMotion }: { mobile: boolean; reducedMotion: boolean }) {
+function CameraRig({ mobile, reducedMotion, structure }: { mobile: boolean; reducedMotion: boolean; structure: StructureKind }) {
   const { camera } = useThree();
   const target = useRef(new THREE.Vector3(0, 0.15, 0));
   useFrame(({ clock }, delta) => {
@@ -36,8 +39,21 @@ function CameraRig({ mobile, reducedMotion }: { mobile: boolean; reducedMotion: 
 
     const idleDrift = reducedMotion ? 0 : Math.sin(clock.elapsedTime * 0.04) * 0.035;
     const theta = 0.82 + eased * 0.44 + idleDrift;
-    const radius = mobile ? lerp(23, 20.5, eased) : lerp(19.5, 15.5, eased);
-    const height = mobile ? lerp(7.8, 6.8, eased) : lerp(7.2, 5.45, eased);
+    const bridge = structure === "bridge";
+    const radius = bridge
+      ? mobile
+        ? lerp(28, 25, eased)
+        : lerp(22.5, 19, eased)
+      : mobile
+        ? lerp(23, 20.5, eased)
+        : lerp(19.5, 15.5, eased);
+    const height = bridge
+      ? mobile
+        ? lerp(8.2, 7.2, eased)
+        : lerp(7.5, 6, eased)
+      : mobile
+        ? lerp(7.8, 6.8, eased)
+        : lerp(7.2, 5.45, eased);
 
     const base = new THREE.Vector3(Math.cos(theta) * radius, height, Math.sin(theta) * radius);
 
@@ -105,7 +121,7 @@ function LightRig({
 }
 
 // Sahne HTML kapsayıcısı dışından görünürlüğe göre frameloop kontrolü
-export default function BuildingScene({ active, reducedMotion }: { active: boolean; reducedMotion: boolean }) {
+export default function BuildingScene({ active, reducedMotion, structure }: { active: boolean; reducedMotion: boolean; structure: StructureKind }) {
   const mobile = useIsMobile();
   const keyLight = useRef<THREE.DirectionalLight>(null);
   const hemiLight = useRef<THREE.HemisphereLight>(null);
@@ -173,7 +189,7 @@ export default function BuildingScene({ active, reducedMotion }: { active: boole
           <meshStandardMaterial color="#101c2a" roughness={0.98} metalness={0.02} />
         </mesh>
 
-        <Building mobile={mobile} />
+        {structure === "bridge" ? <Bridge mobile={mobile} /> : <Building mobile={mobile} />}
 
         <ContactShadows
           position={[0, -2.17, 0]}
@@ -185,7 +201,7 @@ export default function BuildingScene({ active, reducedMotion }: { active: boole
           color="#050b14"
         />
 
-        <CameraRig mobile={mobile} reducedMotion={reducedMotion} />
+        <CameraRig mobile={mobile} reducedMotion={reducedMotion} structure={structure} />
         <AdaptiveDpr pixelated={false} />
       </Suspense>
     </Canvas>

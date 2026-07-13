@@ -18,7 +18,9 @@ const BuildingScene = dynamic(() => import("./hero3d/BuildingScene"), {
   loading: () => <div className="absolute inset-0 bg-[#0F1B2E]" />,
 });
 
-const PHASES = [
+type StructureKind = "building" | "bridge";
+
+const BUILDING_PHASES = [
   {
     label: "Statik Kurgu",
     meta: "01 / Teknik model",
@@ -50,6 +52,38 @@ const PHASES = [
     description: "Malzeme, ışık ve mühendislik tek bir rafine mimari ifadede tamamlanır.",
   },
 ];
+const BRIDGE_PHASES = [
+  {
+    label: "Aks & G?zerg?h",
+    meta: "01 / Teknik model",
+    description: "?st ge?idin a??kl?klar?, ta??y?c? akslar? ve yol geometrisi m?hendislik ?izgileriyle kurulur.",
+  },
+  {
+    label: "Temeller",
+    meta: "02 / Zemin sistemi",
+    description: "Kenar mesnetleri ve orta ayak temelleri y?kleri g?venle zemine aktaracak ?ekilde olu?ur.",
+  },
+  {
+    label: "Ayak & Ba?l?klar",
+    meta: "03 / Betonarme sistem",
+    description: "K?pr? ayaklar? y?kselir, ba?l?k kiri?leri tabliye sistemini kar??lamaya haz?rlan?r.",
+  },
+  {
+    label: "Ana Kiri?ler",
+    meta: "04 / ?elik sistem",
+    description: "Boyuna ana kiri?ler ve enine ba?lant?lar a??kl?klar boyunca ta??y?c? omurgay? tamamlar.",
+  },
+  {
+    label: "Tabliye & Yol",
+    meta: "05 / ?styap?",
+    description: "Betonarme tabliye, asfalt y?zey ve g?venlik bariyerleri ta??y?c? sistemin ?zerine yerle?ir.",
+  },
+  {
+    label: "Nihai ?st Ge?it",
+    meta: "06 / Teslim",
+    description: "?erit ?izgileri, korkuluklar ve ayd?nlatma elemanlar?yla ?st ge?it kullan?ma haz?r h?le gelir.",
+  },
+];
 
 const PHASE_BOUNDARIES = [0.1, 0.28, 0.48, 0.68, 0.88, 1.01];
 
@@ -71,6 +105,7 @@ export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const [phase, setPhase] = useState(0);
   const [active, setActive] = useState(true);
+  const [structure, setStructure] = useState<StructureKind>("building");
   const reducedMotion = useReducedMotion() ?? false;
 
   const { scrollYProgress } = useScroll({
@@ -92,7 +127,7 @@ export default function Hero() {
   useMotionValueEvent(progress, "change", (value) => {
     heroProgress.value = value;
     const index = PHASE_BOUNDARIES.findIndex((boundary) => value < boundary);
-    const safeIndex = index === -1 ? PHASES.length - 1 : index;
+    const safeIndex = index === -1 ? BUILDING_PHASES.length - 1 : index;
     setPhase((previous) => (previous === safeIndex ? previous : safeIndex));
   });
 
@@ -107,7 +142,7 @@ export default function Hero() {
     return () => observer.disconnect();
   }, []);
 
-  const currentPhase = PHASES[phase];
+  const currentPhase = (structure === "bridge" ? BRIDGE_PHASES : BUILDING_PHASES)[phase];
 
   return (
     <section
@@ -122,7 +157,7 @@ export default function Hero() {
     >
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         <div className="absolute inset-0 top-[9%] md:top-0 lg:left-[32%]">
-          <BuildingScene active={active} reducedMotion={reducedMotion} />
+          <BuildingScene active={active} reducedMotion={reducedMotion} structure={structure} />
         </div>
 
         <motion.div
@@ -155,6 +190,31 @@ export default function Hero() {
               Yapısal tasarım / 2026
             </span>
           </div>
+        </div>
+        <div
+          className="absolute right-5 top-36 z-20 flex overflow-hidden border border-white/20 bg-[#0F1B2E]/70 p-1 backdrop-blur-md md:right-14 md:top-40"
+          role="group"
+          aria-label="3D yap? t?r?"
+        >
+          {([
+            ["building", "Yap?"],
+            ["bridge", "?st Ge?it"],
+          ] as const).map(([value, label]) => {
+            const selected = structure === value;
+            return (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => setStructure(value)}
+                className={`px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] transition-colors md:px-5 ${
+                  selected ? "bg-[#B9C2CD] text-[#16273B]" : "text-white/55 hover:text-white"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
 
         <div className="absolute inset-0 flex items-center pointer-events-none">
