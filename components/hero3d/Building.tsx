@@ -15,14 +15,12 @@ import { heroProgress } from "@/lib/heroProgress";
   5. Beton & Cam     (0.58–0.84) Hacimler ve cam belirir, ışık ısınmaya başlar.
   6. Nihai Eser      (0.78–1.00) Golden-hour ışığında tamamlanmış mimari eser.
 
-  Nihai kompozisyon: katı beton bir taban kütlesi üzerinde, bir tarafa doğru
-  taşan (cantilever) tamamen camla kaplı üst kütle — aralarında kalın bir
-  aktarma kirişi (mühendislik hikayesini görünür kılar) ve kompozisyonu
-  dikeyde tutan ince bir beton kanat duvarı. İnşaat/mühendislik markasına
-  uygun, gerçek bir çağdaş mimari nesne — düz bir ızgara kafes değil.
+  Nihai kompozisyon: tek bakışta "bina" olarak okunan, sade ve zarif bir
+  kule — taş/beton bir plinth (giriş katı), üzerinde cam cepheli uzun bir
+  gövde, tepede geri çekilmiş (setback) bir taç katı. Simetrik, dikeyliği
+  vurgulayan, inşaat/mühendislik markasına uygun klasik bir mimari siluet —
+  soyut/karmaşık bir kütle değil.
 */
-
-const FH = 0.85;
 
 function smoothstep(a: number, b: number, x: number) {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
@@ -38,20 +36,20 @@ export default function Building({ mobile }: { mobile: boolean }) {
   const concreteRef = useRef<THREE.Group>(null);
   const glassRef = useRef<THREE.Group>(null);
 
-  // ── Kütle geometrisi ──
+  // ── Kütle geometrisi — simetrik, dikey kule siluet ──
   const massing = useMemo(() => {
-    const baseFloors = mobile ? 2 : 3;
-    const upperFloors = mobile ? 3 : 5;
-    const bx = 1.6, bz = 1.5; // taban yarı-genişlik/derinlik
-    const ux = 2.15, uz = 1.05; // üst kütle (cam) yarı-genişlik/derinlik
-    const offsetX = 1.0; // üst kütlenin +X yönünde taştığı mesafe
-    const baseH = baseFloors * FH;
-    const upperH = upperFloors * FH;
-    const totalH = baseH + upperH;
-    return { baseFloors, upperFloors, bx, bz, ux, uz, offsetX, baseH, upperH, totalH };
+    const shaftFloors = mobile ? 5 : 8;
+    const crownFloors = mobile ? 1 : 2;
+    const px = 1.3, pz = 1.1, pH = 1.05; // plinth (giriş katı)
+    const sx = 1.0, sz = 0.85, sF = 0.55; // gövde (kat yüksekliği)
+    const cx = 0.78, cz = 0.65, cF = 0.55; // taç (setback)
+    const shaftH = shaftFloors * sF;
+    const crownH = crownFloors * cF;
+    const totalH = pH + shaftH + crownH;
+    return { shaftFloors, crownFloors, px, pz, pH, sx, sz, sF, cx, cz, cF, shaftH, crownH, totalH };
   }, [mobile]);
 
-  const { bx, bz, ux, uz, offsetX, baseH, upperH, totalH, baseFloors, upperFloors } = massing;
+  const { shaftFloors, crownFloors, px, pz, pH, sx, sz, sF, cx, cz, cF, shaftH, crownH, totalH } = massing;
 
   // Birkaç zarif kılavuz çizgi — evre 1'in tüm gizemi, iskeletle ilgisiz
   const mysteryLines = useMemo(() => {
@@ -59,10 +57,10 @@ export default function Building({ mobile }: { mobile: boolean }) {
     const arr: { a: THREE.Vector3; b: THREE.Vector3 }[] = [];
     for (let i = 0; i < n; i++) {
       const ang = (i / n) * Math.PI * 2;
-      const r = 1.6 + (i % 3) * 0.7;
+      const r = 1.3 + (i % 3) * 0.55;
       const y0 = totalH * 0.2 + (i % 4) * totalH * 0.15;
       const a = new THREE.Vector3(Math.cos(ang) * r, y0, Math.sin(ang) * r);
-      const b = new THREE.Vector3(Math.cos(ang + 0.6) * (r * 0.4), y0 + totalH * 0.35, Math.sin(ang + 0.6) * (r * 0.4));
+      const b = new THREE.Vector3(Math.cos(ang + 0.6) * (r * 0.4), y0 + totalH * 0.3, Math.sin(ang + 0.6) * (r * 0.4));
       arr.push({ a, b });
     }
     return arr;
@@ -77,50 +75,50 @@ export default function Building({ mobile }: { mobile: boolean }) {
     [mysteryLines]
   );
 
-  // ── İskelet: taban kolonları, üst kolonlar, aktarma kirişi + kat kirişleri ──
+  // ── İskelet: plinth + gövde + taç kolonları, birkaç kat halkası ──
   const bars: Bar[] = useMemo(() => {
     const arr: Bar[] = [];
     let seed = 0;
     const push = (pos: [number, number, number], args: [number, number, number]) => arr.push({ pos, args, seed: seed++ });
+    const ring = (y: number, hx: number, hz: number, t = 0.08) => {
+      push([0, y, -hz], [hx * 2, t, t]);
+      push([0, y, hz], [hx * 2, t, t]);
+      push([-hx, y, 0], [t, t, hz * 2]);
+      push([hx, y, 0], [t, t, hz * 2]);
+    };
 
-    // Taban köşe kolonları
-    for (const x of [-bx, bx]) for (const z of [-bz, bz]) push([x, baseH / 2, z], [0.16, baseH, 0.16]);
-    // Taban kat kirişleri (üst ring, aktarma kirişiyle çakışmayacak şekilde son kat hariç)
-    for (let f = 1; f < baseFloors; f++) {
-      const y = f * FH;
-      push([0, y, -bz], [bx * 2, 0.1, 0.1]);
-      push([0, y, bz], [bx * 2, 0.1, 0.1]);
-      push([-bx, y, 0], [0.1, 0.1, bz * 2]);
-      push([bx, y, 0], [0.1, 0.1, bz * 2]);
-    }
-    // Aktarma kirişi — cantilever'ı taşıyan derin çelik kiriş halkası (mühendislik anlatısı)
-    push([offsetX, baseH, -uz], [ux * 2, 0.3, 0.16]);
-    push([offsetX, baseH, uz], [ux * 2, 0.3, 0.16]);
-    push([offsetX - ux, baseH, 0], [0.16, 0.3, uz * 2]);
-    push([offsetX + ux, baseH, 0], [0.16, 0.3, uz * 2]);
-    // Üst kütle köşe kolonları
-    for (const x of [offsetX - ux, offsetX + ux]) for (const z of [-uz, uz]) push([x, baseH + upperH / 2, z], [0.13, upperH, 0.13]);
-    // Üst kütle kat kirişleri (çatı dahil — ince saçak kirişi)
-    for (let f = 1; f <= upperFloors; f++) {
-      const y = baseH + f * FH;
-      push([offsetX, y, -uz], [ux * 2, 0.09, 0.09]);
-      push([offsetX, y, uz], [ux * 2, 0.09, 0.09]);
-      push([offsetX - ux, y, 0], [0.09, 0.09, uz * 2]);
-      push([offsetX + ux, y, 0], [0.09, 0.09, uz * 2]);
-    }
-    return arr;
-  }, [bx, bz, ux, uz, offsetX, baseH, upperH, baseFloors, upperFloors]);
+    // Plinth köşe kolonları + üst halkası
+    for (const x of [-px, px]) for (const z of [-pz, pz]) push([x, pH / 2, z], [0.18, pH, 0.18]);
+    ring(pH, px, pz, 0.12);
 
-  const slabs = useMemo(() => {
-    const arr: { pos: [number, number, number]; size: [number, number, number] }[] = [];
-    for (let f = 1; f <= baseFloors; f++) {
-      arr.push({ pos: [0, f * FH, 0], size: [bx * 2 + 0.1, 0.14, bz * 2 + 0.1] });
+    // Gövde köşe kolonları (tam yükseklik, plinth üstünden başlar)
+    for (const x of [-sx, sx]) for (const z of [-sz, sz]) push([x, pH + shaftH / 2, z], [0.14, shaftH, 0.14]);
+    // Gövde kat halkaları — her katta değil, ~2 katta bir (uzaktan sade okunur)
+    for (let f = 2; f <= shaftFloors; f += 2) {
+      ring(pH + f * sF, sx, sz);
     }
-    for (let f = 1; f <= upperFloors; f++) {
-      arr.push({ pos: [offsetX, baseH + f * FH, 0], size: [ux * 2 + 0.1, 0.14, uz * 2 + 0.1] });
-    }
+
+    // Taç köşe kolonları + üst halkası
+    const crownBaseY = pH + shaftH;
+    for (const x of [-cx, cx]) for (const z of [-cz, cz]) push([x, crownBaseY + crownH / 2, z], [0.12, crownH, 0.12]);
+    ring(crownBaseY + crownH, cx, cz, 0.07);
+
     return arr;
-  }, [bx, bz, ux, uz, offsetX, baseH, baseFloors, upperFloors]);
+  }, [px, pz, pH, sx, sz, sF, cx, cz, shaftFloors, shaftH, crownH]);
+
+  // ── Beton/cam hacimleri ──
+  const shaftSlabs = useMemo(() => {
+    const arr: [number, number, number][] = [];
+    for (let f = 2; f <= shaftFloors; f += 2) arr.push([0, pH + f * sF, 0]);
+    return arr;
+  }, [pH, sF, shaftFloors]);
+
+  const crownSlabs = useMemo(() => {
+    const arr: [number, number, number][] = [];
+    const base = pH + shaftH;
+    for (let f = 1; f <= crownFloors; f++) arr.push([0, base + f * cF, 0]);
+    return arr;
+  }, [pH, shaftH, cF, crownFloors]);
 
   const tmpV = useMemo(() => new THREE.Vector3(), []);
 
@@ -135,7 +133,7 @@ export default function Building({ mobile }: { mobile: boolean }) {
     const flowAmount = flowRise * flowFall * (mobile ? 0.3 : 1);
     const steelOpacity = smoothstep(0.5, 0.64, p);
     const concreteOpacity = smoothstep(0.58, 0.78, p);
-    const glassOpacity = smoothstep(0.68, 0.9, p) * 0.7;
+    const glassOpacity = smoothstep(0.68, 0.9, p) * 0.72;
 
     if (mysteryRef.current) {
       setOpacity(mysteryRef.current, mysteryOpacity, damp);
@@ -168,7 +166,7 @@ export default function Building({ mobile }: { mobile: boolean }) {
     setOpacity(glassRef.current, glassOpacity, damp);
 
     liftIn(concreteRef.current, concreteOpacity);
-    liftIn(glassRef.current, glassOpacity / 0.7);
+    liftIn(glassRef.current, glassOpacity / 0.72);
   });
 
   return (
@@ -203,40 +201,52 @@ export default function Building({ mobile }: { mobile: boolean }) {
         ))}
       </group>
 
-      {/* Evre 5 — Betonarme: kat döşemeleri, kanat duvar, çatı saçağı, zemin podyumu */}
+      {/* Evre 5 — Betonarme: plinth kütlesi, ara kat halkaları, taç döşemeleri, çatı kapağı */}
       <group ref={concreteRef}>
-        {slabs.map((s, i) => (
-          <mesh key={`s${i}`} position={s.pos} castShadow receiveShadow>
-            <boxGeometry args={s.size} />
-            <meshStandardMaterial color="#c9c6bf" metalness={0.0} roughness={0.92} transparent opacity={0} />
-          </mesh>
-        ))}
-        {/* Beton kanat duvar — kompozisyonu dikeyde tutan mimari imza */}
-        <mesh position={[-bx - 0.06, totalH / 2, -bz + 0.35]} castShadow receiveShadow>
-          <boxGeometry args={[0.22, totalH, 1.0]} />
+        {/* Plinth — katı giriş kütlesi */}
+        <mesh position={[0, pH / 2, 0]} castShadow receiveShadow>
+          <boxGeometry args={[px * 2, pH, pz * 2]} />
           <meshStandardMaterial color="#b7b4ac" metalness={0} roughness={0.95} transparent opacity={0} />
         </mesh>
-        {/* Çatı saçağı — üst kütleden taşan ince beton/metal kesit */}
-        <mesh position={[offsetX, totalH + 0.06, 0]} castShadow receiveShadow>
-          <boxGeometry args={[ux * 2 + 0.6, 0.12, uz * 2 + 0.6]} />
+        {/* Gövde ara kat datumları */}
+        {shaftSlabs.map((s, i) => (
+          <mesh key={`sh${i}`} position={s} receiveShadow>
+            <boxGeometry args={[sx * 2 + 0.06, 0.08, sz * 2 + 0.06]} />
+            <meshStandardMaterial color="#c9c6bf" metalness={0.1} roughness={0.85} transparent opacity={0} />
+          </mesh>
+        ))}
+        {/* Taç kat döşemeleri */}
+        {crownSlabs.map((s, i) => (
+          <mesh key={`cr${i}`} position={s} receiveShadow>
+            <boxGeometry args={[cx * 2 + 0.06, 0.08, cz * 2 + 0.06]} />
+            <meshStandardMaterial color="#c9c6bf" metalness={0.1} roughness={0.85} transparent opacity={0} />
+          </mesh>
+        ))}
+        {/* Taç çatı kapağı */}
+        <mesh position={[0, totalH + 0.05, 0]} castShadow receiveShadow>
+          <boxGeometry args={[cx * 2 + 0.2, 0.1, cz * 2 + 0.2]} />
           <meshStandardMaterial color="#aeb4b8" metalness={0.3} roughness={0.6} transparent opacity={0} />
         </mesh>
-        {/* Zemin podyumu — taban kütlesinden geniş, binayı yere oturtan taraça */}
-        <mesh position={[0, -0.07, 0]} receiveShadow>
-          <boxGeometry args={[bx * 2 + 1.1, 0.14, bz * 2 + 1.1]} />
+        {/* Zemin podyumu */}
+        <mesh position={[0, -0.06, 0]} receiveShadow>
+          <boxGeometry args={[px * 2 + 0.8, 0.12, pz * 2 + 0.8]} />
           <meshStandardMaterial color="#b7b4ac" metalness={0} roughness={0.95} transparent opacity={0} />
         </mesh>
       </group>
 
-      {/* Evre 5–6 — Cam: üst kütlenin dört cephesi + zemin katta giriş şeridi */}
+      {/* Evre 5–6 — Cam: gövde ve taç boyunca sürekli cephe + plinth'te giriş şeridi */}
       <group ref={glassRef}>
         {[
-          { pos: [offsetX, baseH + upperH / 2, uz + 0.02] as [number, number, number], rot: [0, 0, 0] as [number, number, number], w: ux * 2, h: upperH },
-          { pos: [offsetX, baseH + upperH / 2, -uz - 0.02] as [number, number, number], rot: [0, Math.PI, 0] as [number, number, number], w: ux * 2, h: upperH },
-          { pos: [offsetX + ux + 0.02, baseH + upperH / 2, 0] as [number, number, number], rot: [0, Math.PI / 2, 0] as [number, number, number], w: uz * 2, h: upperH },
-          { pos: [offsetX - ux - 0.02, baseH + upperH / 2, 0] as [number, number, number], rot: [0, -Math.PI / 2, 0] as [number, number, number], w: uz * 2, h: upperH },
-          // Zemin katta giriş/lobi cam şeridi
-          { pos: [0, FH * 0.55, bz + 0.02] as [number, number, number], rot: [0, 0, 0] as [number, number, number], w: bx * 1.2, h: FH * 0.8 },
+          { pos: [0, pH + shaftH / 2, sz + 0.02] as [number, number, number], rot: [0, 0, 0] as [number, number, number], w: sx * 2, h: shaftH },
+          { pos: [0, pH + shaftH / 2, -sz - 0.02] as [number, number, number], rot: [0, Math.PI, 0] as [number, number, number], w: sx * 2, h: shaftH },
+          { pos: [sx + 0.02, pH + shaftH / 2, 0] as [number, number, number], rot: [0, Math.PI / 2, 0] as [number, number, number], w: sz * 2, h: shaftH },
+          { pos: [-sx - 0.02, pH + shaftH / 2, 0] as [number, number, number], rot: [0, -Math.PI / 2, 0] as [number, number, number], w: sz * 2, h: shaftH },
+          { pos: [0, pH + shaftH + crownH / 2, cz + 0.02] as [number, number, number], rot: [0, 0, 0] as [number, number, number], w: cx * 2, h: crownH },
+          { pos: [0, pH + shaftH + crownH / 2, -cz - 0.02] as [number, number, number], rot: [0, Math.PI, 0] as [number, number, number], w: cx * 2, h: crownH },
+          { pos: [cx + 0.02, pH + shaftH + crownH / 2, 0] as [number, number, number], rot: [0, Math.PI / 2, 0] as [number, number, number], w: cz * 2, h: crownH },
+          { pos: [-cx - 0.02, pH + shaftH + crownH / 2, 0] as [number, number, number], rot: [0, -Math.PI / 2, 0] as [number, number, number], w: cz * 2, h: crownH },
+          // Plinth giriş cam şeridi
+          { pos: [0, pH * 0.55, pz + 0.02] as [number, number, number], rot: [0, 0, 0] as [number, number, number], w: px * 1.3, h: pH * 0.75 },
         ].map((f, i) => (
           <mesh key={`g${i}`} position={f.pos} rotation={f.rot}>
             <planeGeometry args={[f.w, f.h]} />
@@ -269,9 +279,9 @@ function flowOffset(bar: Bar, amount: number, totalH: number, out: THREE.Vector3
   const s = bar.seed * 0.9;
   const twist = (y / totalH) * 1.4;
   out.set(
-    Math.sin(s + twist) * 0.5 * amount,
-    Math.cos(s * 0.7 + twist * 0.6) * 0.22 * amount,
-    Math.cos(s + twist) * 0.5 * amount
+    Math.sin(s + twist) * 0.4 * amount,
+    Math.cos(s * 0.7 + twist * 0.6) * 0.18 * amount,
+    Math.cos(s + twist) * 0.4 * amount
   );
   return out;
 }
