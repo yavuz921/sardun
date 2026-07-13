@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { Monogram } from "./Logo";
+import Image from "next/image";
 
 const principles = [
   { icon: "verified", title: "Yönetmelik Uyumu", desc: "TBDY 2018 ve Eurocode standartlarına tam uyum." },
@@ -11,9 +11,9 @@ const principles = [
 export default function About() {
   return (
     <section id="hakkimizda" className="relative py-24 md:py-36 px-5 md:px-14 overflow-hidden" style={{ backgroundColor: "#f5f5f2" }}>
-      {/* Arka plan monogram */}
-      <div className="absolute hidden xl:block" style={{ left: "-80px", bottom: "-60px", opacity: 0.05 }}>
-        <Monogram size={480} color="navy" />
+      {/* Arka plan logo dekoru */}
+      <div className="absolute hidden xl:block" style={{ left: "-60px", bottom: "-40px", opacity: 0.04, width: 420 }}>
+        <Image src="/logo-navy.png" alt="" width={420} height={252} style={{ width: "100%", height: "auto" }} unoptimized />
       </div>
 
       <div className="relative mx-auto" style={{ maxWidth: 1440 }}>

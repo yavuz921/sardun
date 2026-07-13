@@ -27,7 +27,7 @@ const services = [
 
 export default function Services() {
   return (
-    <section id="hizmetler" className="relative py-24 md:py-36 px-5 md:px-14 hex-pattern-light">
+    <section id="hizmetler" className="relative py-24 md:py-36 px-5 md:px-14" style={{ backgroundColor: "#f5f5f2" }}>
       <div className="mx-auto" style={{ maxWidth: 1440 }}>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16 md:mb-20">
           <div className="max-w-2xl">
