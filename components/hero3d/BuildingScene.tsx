@@ -18,23 +18,26 @@ function useIsMobile() {
   return mobile;
 }
 
-// Sinematik kamera + fare parallax — asla abartısız, ölçülü hareket.
-// Evre 1 (gizem) boyunca kamera neredeyse hareketsiz kalır; hareket ancak
-// ızgara belirmeye başladığında (drive eğrisi) yavaşça uyanır.
+// Cinematic drone-style orbit — slow, confident, never aggressive.
+// A gentle arc around the subject combined with a slow push-in, plus a
+// near-imperceptible autonomous drift so the camera never feels static.
 function CameraRig() {
   const { camera } = useThree();
   const target = useRef(new THREE.Vector3(0, 0.4, 0));
-  useFrame((_, delta) => {
+  useFrame(({ clock }, delta) => {
     const p = heroProgress.value;
     const damp = 1 - Math.pow(0.0012, delta);
-    const drive = smoothstep(0.06, 1.0, p); // gizem evresinde durgunluk
+    const drive = smoothstep(0.06, 1.0, p); // stillness during the mystery phase
+    const eased = easeInOut(drive);
 
-    // Uzak, sakin mimari fotoğrafçılık kadrajı — bina her zaman rahatça sığar
-    const from = new THREE.Vector3(13, 6.2, 15);
-    const to = new THREE.Vector3(12, 6.6, 13);
-    const base = from.clone().lerp(to, easeInOut(drive));
+    const idleDrift = Math.sin(clock.elapsedTime * 0.045) * 0.05;
+    const theta = 0.95 + eased * 0.42 + idleDrift; // slow orbital sweep
+    const radius = lerp(19, 15.2, eased); // slow push-in, drone descending
+    const height = lerp(7.6, 6.1, eased);
 
-    // Fare parallax — çok ince, asla agresif
+    const base = new THREE.Vector3(Math.cos(theta) * radius, height, Math.sin(theta) * radius);
+
+    // Fare parallax — very subtle, only a sense of depth
     base.x += heroProgress.pointerX * 0.4;
     base.y += heroProgress.pointerY * 0.28;
 
@@ -49,16 +52,22 @@ function smoothstep(a: number, b: number, x: number) {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
   return t * t * (3 - 2 * t);
 }
-
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
 function easeInOut(x: number) {
   return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
 }
 
-// Işık evrimi — blueprint (serin mavi) → golden-hour (sıcak) scroll ile
+// Light evolves through three moods across the whole scroll:
+// dark & cool (blueprint) → soft neutral industrial → warm golden-hour.
 const COOL = new THREE.Color("#a9c6ea");
+const INDUSTRIAL = new THREE.Color("#e7ecf2");
 const WARM = new THREE.Color("#ffcf94");
 const HEMI_COOL = new THREE.Color("#cfe0f0");
+const HEMI_INDUSTRIAL = new THREE.Color("#dfe6ee");
 const HEMI_WARM = new THREE.Color("#ffe6c2");
+const tmpColor = new THREE.Color();
 
 function LightRig({
   keyRef,
@@ -69,18 +78,20 @@ function LightRig({
 }) {
   useFrame((_, delta) => {
     const p = heroProgress.value;
-    // Evre 1: karanlık. Işık, ızgara belirdikçe (0.05–0.32) nazikçe uyanır.
-    const reveal = smoothstep(0.05, 0.32, p);
-    // Evre 5'ten itibaren (0.55–1.0) golden-hour sıcaklığı devreye girer.
-    const warmth = easeInOut(smoothstep(0.55, 1.0, p));
+    // Phase 1: darkness. Light wakes gently as the grid begins to form.
+    const reveal = smoothstep(0.05, 0.3, p);
+    const toIndustrial = smoothstep(0.28, 0.56, p);
+    const toWarm = easeInOut(smoothstep(0.6, 1.0, p));
     const damp = 1 - Math.pow(0.02, delta);
     if (keyRef.current) {
-      keyRef.current.color.lerpColors(COOL, WARM, warmth * 0.85);
-      const targetInt = 0.1 + reveal * 1.5 + warmth * 1.4;
+      tmpColor.copy(COOL).lerp(INDUSTRIAL, toIndustrial).lerp(WARM, toWarm);
+      keyRef.current.color.copy(tmpColor);
+      const targetInt = 0.1 + reveal * 1.3 + toWarm * 1.5;
       keyRef.current.intensity += (targetInt - keyRef.current.intensity) * damp;
     }
     if (hemiRef.current) {
-      hemiRef.current.color.lerpColors(HEMI_COOL, HEMI_WARM, warmth * 0.7);
+      tmpColor.copy(HEMI_COOL).lerp(HEMI_INDUSTRIAL, toIndustrial).lerp(HEMI_WARM, toWarm);
+      hemiRef.current.color.copy(tmpColor);
       const targetHemiInt = 0.05 + reveal * 0.35;
       hemiRef.current.intensity += (targetHemiInt - hemiRef.current.intensity) * damp;
     }
@@ -111,7 +122,7 @@ export default function BuildingScene({ active }: { active: boolean }) {
       dpr={mobile ? [1, 1.5] : [1, 2]}
       frameloop={active ? "always" : "never"}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-      camera={{ position: [13, 6.2, 15], fov: 30, near: 0.1, far: 100 }}
+      camera={{ position: [11.05, 7.6, 15.45], fov: 30, near: 0.1, far: 100 }}
       style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
       onPointerMove={(e) => {
         const w = window.innerWidth || 1;
