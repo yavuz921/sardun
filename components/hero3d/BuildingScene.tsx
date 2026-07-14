@@ -40,7 +40,9 @@ function CameraRig({ mobile, reducedMotion, structure }: { mobile: boolean; redu
     const idleDrift = reducedMotion ? 0 : Math.sin(clock.elapsedTime * 0.04) * 0.035;
     const bridge = structure === "bridge";
     const finale = bridge ? smoothstep(0.74, 1, p) : 0;
-    const theta = bridge ? 0.46 + eased * 0.12 + idleDrift : 0.82 + eased * 0.44 + idleDrift;
+    const theta = bridge
+      ? 0.46 + eased * 0.12 + finale * 0.19 + idleDrift
+      : 0.82 + eased * 0.44 + idleDrift;
     const radius = bridge
       ? mobile
         ? lerp(44, 39, eased) - finale * 4.5
