@@ -65,7 +65,7 @@ function CameraRig({ mobile, reducedMotion, structure }: { mobile: boolean; redu
     base.y += heroProgress.pointerY * 0.28;
 
     camera.position.lerp(base, damp);
-    const targetX = bridge ? lerp(mobile ? -1.1 : -2.4, 0, smoothstep(0, 0.3, p)) : 0;
+    const targetX = bridge ? lerp(mobile ? -1.4 : -3.2, 0, smoothstep(0, 0.3, p)) : 0;
     const targetY = bridge ? lerp(0.28, 0.92, finale) : 0.08 + drive * 0.18;
     target.current.lerp(new THREE.Vector3(targetX, targetY, 0), damp);
     camera.lookAt(target.current);
