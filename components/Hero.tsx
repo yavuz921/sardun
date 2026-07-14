@@ -249,9 +249,9 @@ export default function Hero() {
                   margin: 0,
                 }}
               >
-                Çizgiden
+                Güveni
                 <br />
-                <span className="text-[#B9C2CD]">yapıya.</span>
+                <span className="text-[0.68em] text-[#B9C2CD]">inşa ediyoruz.</span>
               </motion.h1>
 
               <motion.p
