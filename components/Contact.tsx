@@ -74,13 +74,10 @@ export default function Contact() {
                   className="flex items-center gap-5"
                 >
                   <span
-                    className="material-symbols-outlined flex items-center justify-center"
-                    style={{
-                      color: "#B9C2CD", fontSize: 22, width: 52, height: 52,
-                      border: "1px solid rgba(255,255,255,0.15)",
-                    }}
+                    className="grid h-[52px] w-[52px] shrink-0 place-items-center border border-white/15 text-[#B9C2CD]"
+                    aria-hidden="true"
                   >
-                    {c.icon}
+                    <ContactIcon name={c.icon} />
                   </span>
                   <div>
                     <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: "#8fa3b8" }}>
@@ -140,15 +137,20 @@ export default function Contact() {
               </div>
               <div>
                 <label style={labelStyle}>Konu</label>
-                <select style={{ ...inputStyle, appearance: "none" }}>
-                  {["Statik Proje", "Çelik Yapı Tasarımı", "Analiz / Danışmanlık", "Diğer"].map((t) => (
-                    <option key={t} style={{ backgroundColor: "#16273B" }}>{t}</option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select style={{ ...inputStyle, appearance: "none", paddingRight: 42, cursor: "pointer" }}>
+                    {["Statik Proje", "Çelik Yapı Tasarımı", "Analiz / Danışmanlık", "Diğer"].map((t) => (
+                      <option key={t} style={{ backgroundColor: "#16273B" }}>{t}</option>
+                    ))}
+                  </select>
+                  <span className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-[#B9C2CD]" aria-hidden="true">
+                    <ChevronDownIcon />
+                  </span>
+                </div>
               </div>
               <div>
                 <label style={labelStyle}>Mesaj</label>
-                <textarea rows={4} placeholder="Projeniz hakkında kısaca bilgi verin" style={{ ...inputStyle, resize: "none" }} />
+                <textarea rows={2} placeholder="Projeniz hakkında kısaca bilgi verin" style={{ ...inputStyle, minHeight: 74, padding: "10px 0 8px", lineHeight: 1.55, resize: "none" }} />
               </div>
               <motion.button
                 type="submit"
@@ -168,5 +170,27 @@ export default function Contact() {
         </div>
       </div>
     </section>
+  );
+}
+
+function ContactIcon({ name }: { name: string }) {
+  const paths: Record<string, React.ReactNode> = {
+    call: <path d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24c1.08.36 2.24.54 3.42.54a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.54 21 3 13.46 3 4.18a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.2.18 2.34.54 3.42a1 1 0 0 1-.24 1Z" />,
+    mail: <path d="M4 5h16v14H4V5Zm0 1 8 6 8-6" />,
+    location_on: <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />,
+  };
+
+  return (
+    <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      {paths[name]}
+    </svg>
+  );
+}
+
+function ChevronDownIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m7 9.5 5 5 5-5" />
+    </svg>
   );
 }
