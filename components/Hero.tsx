@@ -105,7 +105,7 @@ export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const [phase, setPhase] = useState(0);
   const [active, setActive] = useState(true);
-  const [structure, setStructure] = useState<StructureKind>("building");
+  const [structure, setStructure] = useState<StructureKind>("bridge");
   const reducedMotion = useReducedMotion() ?? false;
 
   const { scrollYProgress } = useScroll({
@@ -203,8 +203,8 @@ export default function Hero() {
           aria-label={"3D yap\u0131 t\u00fcr\u00fc"}
         >
           {([
-            ["building", "Yap\u0131"],
             ["bridge", "\u00dcst Ge\u00e7it"],
+            ["building", "Yap\u0131"],
           ] as const).map(([value, label]) => {
             const selected = structure === value;
             return (
