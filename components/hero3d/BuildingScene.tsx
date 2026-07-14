@@ -66,8 +66,8 @@ function CameraRig({ mobile, reducedMotion, structure }: { mobile: boolean; redu
 
     camera.position.lerp(base, damp);
     const openingSettle = smoothstep(0.12, 0.7, p);
-    const targetX = bridge ? lerp(mobile ? -5.2 : -7.5, 0, openingSettle) : 0;
-    const openingTargetY = lerp(mobile ? -0.45 : -0.85, 0.28, openingSettle);
+    const targetX = bridge ? lerp(mobile ? -5.8 : -8.4, 0, openingSettle) + finale * (mobile ? 1.25 : 2.1) : 0;
+    const openingTargetY = lerp(mobile ? -0.75 : -1.25, 0.28, openingSettle);
     const targetY = bridge ? lerp(openingTargetY, 0.92, finale) : 0.08 + drive * 0.18;
     target.current.lerp(new THREE.Vector3(targetX, targetY, 0), damp);
     camera.lookAt(target.current);
