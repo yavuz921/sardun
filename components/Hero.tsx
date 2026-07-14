@@ -191,10 +191,6 @@ export default function Hero() {
             <span className="text-[10px] md:text-[11px] font-semibold uppercase tracking-[0.28em] text-white/45">
               Ankara · Türkiye
             </span>
-            <span className="hidden sm:flex items-center gap-3 text-[10px] md:text-[11px] font-semibold uppercase tracking-[0.25em] text-white/45">
-              <span className="h-px w-8 bg-[#B9C2CD]/60" />
-              Yapısal tasarım / 2026
-            </span>
           </div>
         </div>
         <div

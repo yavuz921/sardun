@@ -4,10 +4,9 @@ import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 
 const COPY = {
-  section: "Projeler",
-  eyebrow: "02 / Se\u00e7ili \u0130\u015fler",
+  section: "Projelerim",
+  eyebrow: "02 / Projelerim",
   title: "M\u00fchendisli\u011fin iz b\u0131rakt\u0131\u011f\u0131 projeler.",
-  intro: "Her \u00e7al\u0131\u015fma; analiz, modelleme ve detayland\u0131rma disiplinlerinin tek bir yap\u0131sal kararda bulu\u015ftu\u011fu titiz bir s\u00fcrecin sonucu.",
   selection: "Proje se\u00e7kisi",
   works: "se\u00e7ili \u00e7al\u0131\u015fma",
   scope: "Kapsam",
@@ -123,10 +122,9 @@ export default function ProjectsPremium() {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, margin: "-80px" }}
-            className="lg:col-span-4 lg:pl-10"
+            className="flex items-end lg:col-span-4 lg:justify-end"
           >
-            <p className="max-w-md text-sm leading-7 text-white/58 md:text-base">{COPY.intro}</p>
-            <div className="mt-8 flex items-end gap-5 border-t border-white/12 pt-6">
+            <div className="flex min-w-[240px] items-end gap-5 border-t border-white/12 pt-6 lg:min-w-[270px]">
               <span className="text-5xl font-light tracking-[-0.05em] text-white">05</span>
               <div className="pb-1">
                 <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#8FA3B8]">{COPY.works}</div>
