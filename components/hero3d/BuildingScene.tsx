@@ -34,11 +34,11 @@ function CameraRig({ mobile, reducedMotion, structure }: { mobile: boolean; redu
   useFrame(({ clock }, delta) => {
     const p = heroProgress.value;
     const damp = 1 - Math.pow(0.0012, delta);
-    const drive = smoothstep(0.05, 1.0, p);
+    const bridge = structure === "bridge";
+    const drive = smoothstep(bridge ? 0.12 : 0.05, 1.0, p);
     const eased = easeInOut(drive);
 
     const idleDrift = reducedMotion ? 0 : Math.sin(clock.elapsedTime * 0.04) * 0.035;
-    const bridge = structure === "bridge";
     const finale = bridge ? smoothstep(0.74, 1, p) : 0;
     const theta = bridge
       ? 0.46 + eased * 0.12 + finale * 0.19 + idleDrift
@@ -65,8 +65,10 @@ function CameraRig({ mobile, reducedMotion, structure }: { mobile: boolean; redu
     base.y += heroProgress.pointerY * 0.28;
 
     camera.position.lerp(base, damp);
-    const targetX = bridge ? lerp(mobile ? -4.6 : -6.8, 0, smoothstep(0, 0.3, p)) : 0;
-    const targetY = bridge ? lerp(0.28, 0.92, finale) : 0.08 + drive * 0.18;
+    const openingSettle = smoothstep(0.12, 0.7, p);
+    const targetX = bridge ? lerp(mobile ? -5.2 : -7.5, 0, openingSettle) : 0;
+    const openingTargetY = lerp(mobile ? -0.45 : -0.85, 0.28, openingSettle);
+    const targetY = bridge ? lerp(openingTargetY, 0.92, finale) : 0.08 + drive * 0.18;
     target.current.lerp(new THREE.Vector3(targetX, targetY, 0), damp);
     camera.lookAt(target.current);
   });
