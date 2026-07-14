@@ -86,6 +86,7 @@ const BRIDGE_PHASES = [
 ];
 
 const PHASE_BOUNDARIES = [0.1, 0.28, 0.48, 0.68, 0.88, 1.01];
+const SCENE_COMPLETE_AT = 0.78;
 
 const container = {
   hidden: {},
@@ -117,14 +118,15 @@ export default function Hero() {
     damping: 28,
     mass: 0.45,
   });
+  const sceneProgress = useTransform(progress, (value) => Math.min(value / SCENE_COMPLETE_AT, 1));
 
-  const introOpacity = useTransform(progress, [0, 0.09, 0.19], [1, 1, 0]);
-  const introY = useTransform(progress, [0, 0.19], [0, -32]);
-  const stageOpacity = useTransform(progress, [0.08, 0.17], [0, 1]);
-  const gridOpacity = useTransform(progress, [0, 0.24, 0.48], [0.42, 0.18, 0]);
-  const progressScale = useTransform(progress, [0, 1], [0.02, 1]);
+  const introOpacity = useTransform(sceneProgress, [0, 0.09, 0.19], [1, 1, 0]);
+  const introY = useTransform(sceneProgress, [0, 0.19], [0, -32]);
+  const stageOpacity = useTransform(sceneProgress, [0.08, 0.17], [0, 1]);
+  const gridOpacity = useTransform(sceneProgress, [0, 0.24, 0.48], [0.42, 0.18, 0]);
+  const progressScale = useTransform(sceneProgress, [0, 1], [0.02, 1]);
 
-  useMotionValueEvent(progress, "change", (value) => {
+  useMotionValueEvent(sceneProgress, "change", (value) => {
     heroProgress.value = value;
     const index = PHASE_BOUNDARIES.findIndex((boundary) => value < boundary);
     const safeIndex = index === -1 ? BUILDING_PHASES.length - 1 : index;
@@ -151,7 +153,7 @@ export default function Hero() {
       aria-label="Sardun mühendislik yapı animasyonu"
       className="relative"
       style={{
-        height: "360vh",
+        height: "440vh",
         backgroundColor: "#0F1B2E",
       }}
     >
